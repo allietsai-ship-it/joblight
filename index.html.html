@@ -1,0 +1,3195 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔧 工作燈號腳本沙盒</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --c--color-white: #fff;
+      --c--color-orange-100: #fff5ec;
+      --c--color-orange-200: #ffeedf;
+      --c--color-orange-600: #ff9f00;
+      --c--color-orange-700: #ff9100;
+      --c--color-orange-800: #ff7800;
+      --c--color-orange-900: #e76c00;
+      --c--color-orange-1000: #b55500;
+      --c--color-grey-100: #f3f3f3;
+      --c--color-grey-300: #d3d3d3;
+      --c--color-grey-500: #909090;
+      --c--color-grey-600: #a9a9a9;
+      --c--color-grey-800: #5a5a5a;
+      --c--color-grey-1200: #1e1e1e;
+      --c--color-cool-grey-100: #f7f8fa;
+      --c--color-cool-grey-200: #f2f4f7;
+      --c--color-cool-grey-300: #e0e4eb;
+      --c--color-cool-grey-400: #d1d7e2;
+      --c--color-cool-grey-600: #aab2c0;
+      --c--color-cool-grey-800: #676c74;
+      --c--color-cool-grey-900: #474c54;
+      --c--color-cool-grey-1200: #1c2026;
+      --c--color-green-600: #6fb827;
+      --c--color-red-600: #ea475b;
+      --c--color-gold-200: #f5ecd5;
+
+      --c--font-size-xs: 12px;
+      --c--font-size-sm: 14px;
+      --c--font-size-md: 16px;
+      --c--font-size-lg: 18px;
+      --c--font-size-xl: 20px;
+      --c--font-size-4xl: 32px;
+      --c--font-weight-normal: 400;
+      --c--font-weight-medium: 500;
+      --c--font-weight-semibold: 600;
+      --c--font-weight-bold: 700;
+      --c--font-weight-extrabold: 800;
+
+      --c--radius-xs: 4px;
+      --c--radius-sm: 8px;
+      --c--radius-md: 12px;
+      --c--radius-lg: 16px;
+      --c--radius-full: 50%;
+
+      --agent-bubble-radius-bot: 18px 18px 18px 4px;
+      --agent-bubble-radius-user: 18px 18px 4px 18px;
+      --agent-accent: var(--c--color-orange-900);
+      --coolGray01: #f7f8fa;
+      --coolGray02: #f2f4f7;
+      --coolGray03: #e0e4eb;
+      --coolGray05: #aab2c0;
+      --coolGray06: #676c74;
+      --coolGray07: #474c54;
+      --coolGray08: #1c2026;
+      --orange: #ff7800;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--coolGray02);
+      color: var(--c--color-grey-1200);
+      line-height: 1.6;
+    }
+
+    /* ===== TOP BAR ===== */
+    .sandbox-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--c--color-white);
+      border-bottom: 1px solid var(--c--color-grey-100);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .sandbox-title {
+      font-size: var(--c--font-size-lg);
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+      margin-right: auto;
+    }
+
+    .mode-toggle {
+      display: flex;
+      gap: 8px;
+      border: 1px solid var(--c--color-grey-300);
+      border-radius: var(--c--radius-sm);
+      background: var(--c--color-grey-100);
+      padding: 2px;
+    }
+
+    .mode-btn {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: var(--c--font-size-sm);
+      font-weight: var(--c--font-weight-medium);
+      color: var(--c--color-grey-600);
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: var(--c--color-white);
+      color: var(--orange);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .header-select, .header-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--c--color-grey-300);
+      border-radius: var(--c--radius-sm);
+      background: var(--c--color-white);
+      cursor: pointer;
+      font-size: var(--c--font-size-sm);
+      font-weight: var(--c--font-weight-medium);
+      color: var(--c--color-grey-1200);
+      transition: all 0.2s;
+    }
+
+    .header-select:hover, .header-btn:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .header-select:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 2px rgba(255, 120, 0, 0.1);
+    }
+
+    /* ===== MAIN CONTAINER ===== */
+    .sandbox-container {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sandbox-sidebar {
+      width: 240px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-section {
+      background: var(--c--color-white);
+      border-radius: var(--c--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--c--color-grey-100);
+    }
+
+    .sidebar-title {
+      font-size: var(--c--font-size-sm);
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.6;
+    }
+
+    .sidebar-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: var(--c--radius-sm);
+      cursor: not-allowed;
+      opacity: 0.5;
+      font-size: var(--c--font-size-sm);
+      color: var(--c--color-grey-600);
+    }
+
+    /* ===== CONTENT AREA ===== */
+    .sandbox-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .content-panel {
+      display: none;
+    }
+
+    .content-panel.active {
+      display: block;
+    }
+
+    /* ===== OUTLINE MODE ===== */
+    .outline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 16px;
+    }
+
+    .node-card {
+      background: var(--c--color-white);
+      border: 1px solid var(--c--color-grey-100);
+      border-left: 4px solid var(--orange);
+      border-radius: var(--c--radius-md);
+      padding: 16px;
+      transition: all 0.2s;
+    }
+
+    .node-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .node-card.start-node {
+      border-left-color: var(--c--color-green-600);
+      background: linear-gradient(135deg, rgba(111, 184, 39, 0.04) 0%, transparent 100%);
+    }
+
+    .node-card.dead-end {
+      border-left-color: var(--c--color-red-600);
+      background: linear-gradient(135deg, rgba(234, 71, 91, 0.04) 0%, transparent 100%);
+    }
+
+    .node-card-header {
+      font-size: var(--c--font-size-md);
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--c--color-grey-100);
+    }
+
+    .node-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .node-step {
+      font-size: var(--c--font-size-sm);
+      padding: 8px;
+      border-radius: var(--c--radius-sm);
+      background: var(--coolGray02);
+    }
+
+    .node-step.text {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .node-step.text::before {
+      content: '💬';
+      flex-shrink: 0;
+    }
+
+    .node-step.text-content {
+      flex: 1;
+      color: var(--c--color-grey-800);
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .node-step.card {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: linear-gradient(135deg, var(--c--color-orange-100) 0%, var(--c--color-orange-200) 100%);
+      border: 1px solid var(--c--color-orange-600);
+    }
+
+    .node-step.card::before {
+      content: '📊';
+      flex-shrink: 0;
+    }
+
+    .node-step.options {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .node-step.options::before {
+      content: '🔘';
+      margin-bottom: 4px;
+    }
+
+    .option-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border: 1px solid var(--c--color-grey-300);
+      border-radius: 4px;
+      background: var(--c--color-white);
+      font-size: 11px;
+      color: var(--c--color-grey-800);
+    }
+
+    .option-btn.freekey {
+      background: var(--c--color-orange-100);
+      border-color: var(--orange);
+      color: var(--c--color-orange-1000);
+    }
+
+    .option-btn.dead {
+      opacity: 0.5;
+      color: var(--c--color-grey-600);
+    }
+
+    .node-step.auto-next {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: linear-gradient(135deg, var(--c--color-cool-grey-200) 0%, var(--c--color-cool-grey-100) 100%);
+      border: 1px solid var(--c--color-cool-grey-300);
+    }
+
+    .node-step.auto-next::before {
+      content: '⏱️';
+      flex-shrink: 0;
+    }
+
+    .data-section {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 2px solid var(--c--color-grey-100);
+    }
+
+    .data-title {
+      font-size: var(--c--font-size-md);
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+      margin-bottom: 12px;
+    }
+
+    .data-collapsible {
+      background: var(--coolGray02);
+      border-radius: var(--c--radius-sm);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .data-collapsible-title {
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: var(--c--font-weight-medium);
+      font-size: var(--c--font-size-sm);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--c--color-grey-800);
+    }
+
+    .data-collapsible-title:hover {
+      background: var(--c--color-grey-100);
+    }
+
+    .data-collapsible-title::before {
+      content: '▶';
+      display: inline-block;
+      transition: transform 0.2s;
+      width: 16px;
+    }
+
+    .data-collapsible.open .data-collapsible-title::before {
+      transform: rotate(90deg);
+    }
+
+    .data-collapsible-content {
+      display: none;
+      padding: 12px;
+      background: var(--c--color-white);
+      border-top: 1px solid var(--c--color-grey-100);
+      font-size: var(--c--font-size-xs);
+      font-family: 'Monaco', 'Menlo', monospace;
+      overflow-x: auto;
+      color: var(--c--color-grey-800);
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .data-collapsible.open .data-collapsible-content {
+      display: block;
+    }
+
+    /* ===== DIALOGUE MODE ===== */
+    .dialogue-container {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .agent-sidebar {
+      width: 416px;
+      background: var(--c--color-white);
+      border: 1px solid var(--coolGray03);
+      border-radius: var(--c--radius-lg);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      overflow: hidden;
+      height: 85vh;
+    }
+
+    /* ── 模擬 Header ── */
+    .sim-header {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--coolGray03);
+      background: var(--c--color-white);
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .sim-header-logo {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 16px; font-weight: 700; color: var(--orange);
+    }
+    .sim-header-logo svg { height: 16px; width: auto; }
+    .sim-header-spacer { flex: 1; }
+    .sim-header-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--orange); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+    }
+
+    /* ── 模擬 TabBar ── */
+    .sim-tabbar {
+      display: flex; border-bottom: 1px solid var(--coolGray03);
+      flex-shrink: 0; background: var(--c--color-white);
+    }
+    .sim-tab {
+      flex: 1; text-align: center; padding: 10px 0;
+      font-size: var(--c--font-size-sm); font-weight: var(--c--font-weight-medium);
+      color: var(--coolGray05); cursor: default;
+      border-bottom: 2px solid transparent;
+    }
+    .sim-tab.active {
+      color: var(--orange); border-bottom-color: var(--orange);
+      font-weight: var(--c--font-weight-bold);
+    }
+
+    /* ── 模擬 HealthBanner ── */
+    .sim-health-banner {
+      display: flex; align-items: center;
+      background: var(--c--color-cool-grey-1200);
+      padding: 0 12px; height: 64px;
+      overflow-x: auto; overflow-y: hidden;
+      flex-shrink: 0; gap: 0;
+      scrollbar-width: none;
+    }
+    .sim-health-banner::-webkit-scrollbar { display: none; }
+    .sim-health-home {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 0 10px; flex-shrink: 0; cursor: default;
+    }
+    .sim-health-home-icon { display: flex; align-items: center; justify-content: center; }
+    .sim-health-home-icon svg { width: 20px; height: 20px; }
+    .sim-health-home-label { font-size: 10px; color: rgba(255,255,255,0.7); }
+    .sim-health-sep {
+      width: 1px; height: 28px; background: rgba(255,255,255,0.15);
+      flex-shrink: 0; margin: 0 4px;
+    }
+    .sim-health-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 8px;
+      flex-shrink: 0; cursor: default;
+      transition: background 0.2s;
+    }
+    .sim-health-item.active-theme {
+      background: rgba(255,255,255,0.1);
+    }
+    .sim-health-dot {
+      width: 28px; height: 26px;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .sim-health-dot svg.health-icon { width: 28px; height: 26px; }
+    .sim-health-info { display: flex; flex-direction: column; gap: 1px; }
+    .sim-health-name {
+      font-size: 12px; font-weight: 600; color: #fff;
+      white-space: nowrap;
+    }
+    .sim-health-level {
+      font-size: 10px; color: rgba(255,255,255,0.6);
+      white-space: nowrap;
+    }
+
+    /* ── Agent Title Bar ── */
+    .agent-header {
+      padding: 0 0 12px 0;
+      border-bottom: 1px solid var(--coolGray03);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .agent-title-icon {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--orange); display: flex;
+      align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .agent-title-icon svg { width: 14px; height: 14px; }
+    .agent-title {
+      flex: 1;
+      font-size: 15px;
+      font-weight: var(--c--font-weight-bold);
+      color: var(--coolGray08);
+    }
+    .agent-close-btn {
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; background: none; border: none;
+      color: var(--coolGray05); transition: background 0.15s;
+      font-size: 16px;
+    }
+    .agent-close-btn:hover { background: var(--coolGray02); }
+
+    /* ── Chat Content Area ── */
+    .agent-chat {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    /* ── Agent Profile Card (first element in chat) ── */
+    .agent-profile {
+      display: flex; align-items: center; gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--coolGray03);
+    }
+    .agent-profile-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      overflow: hidden; flex-shrink: 0;
+      box-shadow: 1px 1px 8px 0 rgba(0,0,0,0.12);
+      background: linear-gradient(135deg, var(--c--color-orange-200), var(--c--color-orange-100));
+      display: flex; align-items: center; justify-content: center;
+    }
+    .agent-profile-avatar span { font-size: 28px; }
+    .agent-profile-info { flex: 1; min-width: 0; }
+    .agent-profile-name {
+      font-size: 16px; font-weight: 700; color: var(--coolGray08);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .agent-profile-badge {
+      display: inline-flex; padding: 1px 6px; border-radius: 4px;
+      font-size: 11px; font-weight: 600;
+      background: var(--coolGray02); color: var(--coolGray06);
+      border: 1px solid var(--coolGray03);
+    }
+    .agent-profile-detail {
+      font-size: 12px; color: var(--coolGray05); margin-top: 2px;
+    }
+
+    .agent-greeting-title {
+      font-size: 20px; font-weight: 700; color: var(--coolGray08);
+      line-height: 1.5;
+    }
+
+    /* ── Bot Message Bubble ── */
+    .agent-chat-bot {
+      margin: 4px 0;
+      padding-left: 4px;
+      font-size: var(--c--font-size-sm);
+      line-height: 1.75;
+      color: var(--c--color-cool-grey-1200);
+      animation: slideInBot 0.3s ease-out;
+    }
+    .agent-chat-bot strong { color: var(--c--color-orange-1000); }
+    .agent-chat-bot p { margin: 0 0 8px; }
+
+    .agent-chat-bot.typing::after {
+      content: '▊';
+      animation: blink 0.6s step-end infinite;
+      color: var(--c--color-orange-900);
+      font-size: var(--c--font-size-xs);
+      margin-left: 1px;
+    }
+
+    @keyframes slideInBot {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    /* ── User Message Bubble ── */
+    .agent-chat-user {
+      display: flex; justify-content: flex-end;
+      margin: 12px 0 8px;
+      animation: slideInUser 0.3s ease-out;
+    }
+
+    @keyframes slideInUser {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .agent-chat-user-text {
+      background: var(--c--color-orange-900);
+      color: var(--c--color-white);
+      padding: 10px 16px;
+      border-radius: 18px 18px 4px 18px;
+      font-size: var(--c--font-size-sm);
+      line-height: 1.5;
+      max-width: 80%;
+      width: fit-content;
+      word-break: break-word;
+    }
+
+    /* ── Options ── */
+    .agent-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 8px 0;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .agent-option-btn {
+      padding: 8px 16px;
+      border: 1.5px solid var(--c--color-orange-800);
+      border-radius: 9999px;
+      background: var(--c--color-white);
+      color: var(--c--color-orange-800);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: var(--c--font-weight-medium);
+      transition: all 0.2s;
+      text-align: left;
+      width: fit-content;
+    }
+
+    .agent-option-btn:hover:not(.selected):not(:disabled) {
+      background: var(--c--color-orange-100);
+      transform: translateX(2px);
+    }
+
+    .agent-option-btn.selected {
+      background: var(--c--color-orange-700);
+      color: var(--c--color-white);
+      border-color: var(--c--color-orange-700);
+    }
+
+    .agent-option-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ── Freekey Input (inline in chat) ── */
+    .agent-freekey-wrap {
+      display: none; /* hidden by default, shown via bottom input bar */
+    }
+
+    /* ── Bottom Input Area (fixed) ── */
+    .agent-input-area {
+      display: flex;
+      padding: 8px;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      align-self: stretch;
+      flex-shrink: 0;
+      border-top: 1px solid var(--coolGray03);
+      background: var(--c--color-white);
+    }
+    .agent-input-box {
+      display: flex; align-items: center; gap: 8px;
+      align-self: stretch;
+      background: var(--coolGray01);
+      border: 1px solid var(--coolGray03);
+      border-radius: 12px; padding: 10px 12px;
+      transition: border-color 0.15s;
+    }
+    .agent-input-box:focus-within { border-color: var(--orange); }
+    .agent-input-box input {
+      flex: 1; border: none; outline: none;
+      background: transparent; font-size: 13px;
+      font-family: inherit; color: var(--coolGray08);
+    }
+    .agent-input-box input::placeholder { color: var(--coolGray05); }
+    .agent-send-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--orange);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; border: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .agent-send-btn:hover { background: #e66a00; transform: scale(1.05); }
+    .agent-send-btn svg { width: 16px; height: 16px; }
+    .agent-disclaimer {
+      font-size: 11px; color: var(--coolGray05);
+      text-align: center; align-self: stretch;
+    }
+
+    /* ── Turn Separator ── */
+    .agent-turn-sep {
+      border: none; border-top: 1px solid var(--c--color-cool-grey-200);
+      margin: 8px 0;
+    }
+
+    /* ── CoT Thinking Block ── */
+    .cot-thinking {
+      margin: 8px 0;
+      border-left: 2px solid var(--c--color-cool-grey-300);
+      padding-left: 12px; overflow: hidden;
+    }
+    .cot-thinking.active { border-left-color: var(--c--color-orange-900); }
+    .cot-thinking.done { border-left-color: var(--coolGray03); }
+    .cot-thinking-header {
+      display: flex; align-items: center; gap: 8px; padding: 4px 0;
+    }
+    .cot-spinner {
+      width: 14px; height: 14px; min-width: 14px;
+      border: 2px solid var(--c--color-cool-grey-300);
+      border-top-color: var(--c--color-orange-900);
+      border-radius: 50%; animation: cot-spin 0.7s linear infinite;
+    }
+    .cot-thinking.done .cot-spinner {
+      border: none; animation: none;
+      background: var(--c--color-green-600); border-radius: 50%;
+    }
+    .cot-thinking-label {
+      font-size: var(--c--font-size-xs);
+      color: var(--c--color-cool-grey-600);
+    }
+    .cot-thinking.active .cot-thinking-label {
+      color: var(--c--color-orange-1000); font-weight: var(--c--font-weight-medium);
+    }
+    .cot-shimmer {
+      height: 8px; margin: 5px 0; border-radius: 4px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: cot-shimmer-move 1.3s ease-in-out infinite;
+    }
+    .cot-shimmer:nth-child(2) { width: 65%; animation-delay: 0.12s; }
+    .cot-shimmer:nth-child(3) { width: 45%; animation-delay: 0.24s; }
+    @keyframes cot-spin { to { transform: rotate(360deg); } }
+    @keyframes cot-shimmer-move {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Toast ── */
+    .agent-toast {
+      position: fixed; bottom: 80px; left: 50%;
+      transform: translateX(-50%); padding: 10px 20px;
+      background: var(--coolGray08); color: white;
+      border-radius: 8px; font-size: 13px; z-index: 999;
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .agent-toast.show { opacity: 1; }
+
+    /* ===== CARDS ===== */
+    .job-card {
+      margin: 12px 0;
+      padding: 16px;
+      background: var(--c--color-white);
+      border-radius: 18px 18px 18px 4px;
+      border: 1px solid var(--c--color-grey-100);
+      align-self: flex-start;
+      max-width: 85%;
+    }
+
+    .job-card-header {
+      margin-bottom: 12px;
+    }
+
+    .job-card-title {
+      font-size: var(--c--font-size-md);
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+      margin-bottom: 4px;
+    }
+
+    .job-card-subtitle {
+      font-size: var(--c--font-size-sm);
+      color: var(--c--color-grey-600);
+    }
+
+    /* PR Card */
+    .job-pr-title {
+      font-size: var(--c--font-size-md);
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+      margin-bottom: 8px;
+    }
+
+    .job-pr-desc {
+      font-size: var(--c--font-size-sm);
+      color: var(--c--color-grey-600);
+      margin-bottom: 12px;
+    }
+
+    .job-pr-display {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: var(--c--color-orange-100);
+      border-radius: var(--c--radius-sm);
+    }
+
+    .job-pr-label {
+      font-size: var(--c--font-size-sm);
+      color: var(--c--color-grey-600);
+    }
+
+    .job-pr-value {
+      font-size: var(--c--font-size-lg);
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-orange-1000);
+    }
+
+    .job-pr-num {
+      font-size: var(--c--font-size-4xl);
+      font-weight: var(--c--font-weight-extrabold);
+    }
+
+    .job-pr-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .job-pr-slider {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--c--color-grey-300);
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+    }
+
+    .job-pr-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--orange);
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .job-pr-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--orange);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .job-pr-min, .job-pr-max {
+      font-size: var(--c--font-size-sm);
+      color: var(--c--color-grey-600);
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .job-pr-submit {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: var(--c--radius-sm);
+      background: var(--orange);
+      color: var(--c--color-white);
+      font-weight: var(--c--font-weight-semibold);
+      cursor: pointer;
+      font-size: var(--c--font-size-sm);
+      transition: all 0.2s;
+    }
+
+    .job-pr-submit:hover {
+      background: var(--c--color-orange-800);
+    }
+
+    /* Company Card */
+    .job-company-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .job-company-stat {
+      padding: 12px;
+      border-radius: var(--c--radius-sm);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .job-company-stat-icon {
+      font-size: 24px;
+    }
+
+    .job-company-stat-value {
+      font-size: var(--c--font-size-md);
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+    }
+
+    .job-company-stat-label {
+      font-size: var(--c--font-size-xs);
+      font-weight: var(--c--font-weight-medium);
+      color: var(--c--color-grey-800);
+    }
+
+    .job-company-stat-desc {
+      font-size: var(--c--font-size-xs);
+      color: var(--c--color-grey-600);
+      line-height: 1.4;
+    }
+
+    /* Value Card Input */
+    .job-value-list {
+      list-style: none;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .job-value-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--coolGray02);
+      border-radius: var(--c--radius-sm);
+      cursor: move;
+      user-select: none;
+      font-size: var(--c--font-size-sm);
+    }
+
+    .job-value-item.dragging {
+      opacity: 0.5;
+    }
+
+    .job-value-rank {
+      min-width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--orange);
+      color: white;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .job-value-label {
+      flex: 1;
+      color: var(--c--color-grey-1200);
+    }
+
+    .job-value-grip {
+      cursor: grab;
+      color: var(--c--color-grey-600);
+      font-size: 12px;
+    }
+
+    .job-value-grip:active {
+      cursor: grabbing;
+    }
+
+    .job-value-submit {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: var(--c--radius-sm);
+      background: var(--orange);
+      color: var(--c--color-white);
+      font-weight: var(--c--font-weight-semibold);
+      cursor: pointer;
+      font-size: var(--c--font-size-sm);
+      transition: all 0.2s;
+    }
+
+    .job-value-submit:hover {
+      background: var(--c--color-orange-800);
+    }
+
+    /* Radar Card */
+    .job-radar-svg {
+      width: 100%;
+      max-width: 300px;
+      margin: 12px auto;
+      display: block;
+    }
+
+    .radar-label {
+      font-size: 11px;
+      fill: var(--c--color-grey-800);
+      text-anchor: middle;
+    }
+
+    .radar-legend {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: var(--c--font-size-xs);
+    }
+
+    .radar-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .radar-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Skill Cards */
+    .job-skill-input-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .job-skill-input-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--coolGray02);
+      border-radius: var(--c--radius-sm);
+    }
+
+    .job-skill-input-label {
+      font-size: var(--c--font-size-sm);
+      color: var(--c--color-grey-1200);
+      flex: 1;
+    }
+
+    .job-skill-input-stars {
+      font-size: 18px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      color: var(--c--color-grey-300);
+      transition: color 0.2s;
+    }
+
+    .job-skill-input-stars:hover {
+      color: var(--c--color-orange-600);
+    }
+
+    .job-skill-input-stars.rated {
+      color: var(--c--color-orange-800);
+    }
+
+    .job-skill-input-submit {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: var(--c--radius-sm);
+      background: var(--orange);
+      color: var(--c--color-white);
+      font-weight: var(--c--font-weight-semibold);
+      cursor: pointer;
+      font-size: var(--c--font-size-sm);
+      transition: all 0.2s;
+    }
+
+    .job-skill-input-submit:hover:not(:disabled) {
+      background: var(--c--color-orange-800);
+    }
+
+    .job-skill-input-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Skill Summary */
+    .job-skill-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .job-skill-summary-card {
+      padding: 12px;
+      border-radius: var(--c--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--c--color-white);
+      font-weight: var(--c--font-weight-semibold);
+      font-size: var(--c--font-size-sm);
+    }
+
+    .job-skill-summary-icon {
+      font-size: 20px;
+    }
+
+    /* Light Card */
+    .job-light-card {
+      border-left: 4px solid #FFB300;
+      background: #FFF8E1;
+      padding: 12px;
+      border-radius: var(--c--radius-sm);
+      margin: 8px 0;
+    }
+
+    .job-light-title {
+      font-weight: var(--c--font-weight-semibold);
+      color: #8D6E00;
+      font-size: var(--c--font-size-sm);
+      margin-bottom: 4px;
+    }
+
+    .job-light-desc {
+      font-size: var(--c--font-size-xs);
+      color: #8D6E00;
+      line-height: 1.5;
+    }
+
+    .job-light-hint {
+      margin-top: 8px;
+      font-size: var(--c--font-size-xs);
+      color: #FFB300;
+      font-weight: var(--c--font-weight-semibold);
+    }
+
+    /* Todo Card */
+    .job-todo-item {
+      padding: 12px;
+      border-radius: var(--c--radius-sm);
+      border-left: 3px solid var(--orange);
+      background: var(--coolGray02);
+      margin: 8px 0;
+    }
+
+    .job-todo-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .job-todo-number {
+      min-width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--orange);
+      color: white;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .job-todo-title {
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+      font-size: var(--c--font-size-sm);
+    }
+
+    .job-todo-reason {
+      padding: 8px;
+      background: var(--c--color-orange-200);
+      border-left: 2px solid var(--orange);
+      border-radius: 4px;
+      font-size: var(--c--font-size-xs);
+      color: var(--c--color-grey-1200);
+      line-height: 1.5;
+    }
+
+    /* Connect Card */
+    .job-connect-card {
+      padding: 12px;
+      background: var(--coolGray02);
+      border-radius: var(--c--radius-sm);
+      margin: 8px 0;
+    }
+
+    .job-connect-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .job-connect-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--c--color-orange-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .job-connect-info {
+      flex: 1;
+    }
+
+    .job-connect-name {
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+      font-size: var(--c--font-size-sm);
+      margin-bottom: 2px;
+    }
+
+    .job-connect-role {
+      font-size: var(--c--font-size-xs);
+      color: var(--c--color-grey-800);
+      line-height: 1.4;
+    }
+
+    .job-connect-prev {
+      font-size: var(--c--font-size-xs);
+      color: var(--c--color-grey-600);
+      margin-top: 4px;
+    }
+
+    .job-connect-story {
+      padding: 8px;
+      background: var(--c--color-cool-grey-100);
+      border-radius: 4px;
+      font-size: var(--c--font-size-xs);
+      color: var(--c--color-grey-1200);
+      line-height: 1.5;
+      margin: 8px 0;
+    }
+
+    .job-connect-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .job-connect-tag {
+      display: inline-block;
+      padding: 2px 6px;
+      background: var(--c--color-orange-200);
+      color: var(--c--color-orange-1000);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: var(--c--font-weight-medium);
+    }
+
+
+    /* ── data-tag：文字內嵌資料標籤 ── */
+    .data-tag {
+      display: inline-block;
+      background: #EEF2FF;
+      color: #4338CA;
+      border: 1px solid #C7D2FE;
+      border-radius: 6px;
+      padding: 1px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 0 2px;
+      vertical-align: middle;
+    }
+
+    /* ── job_market_card（左右滑動）── */
+    .job-market-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .job-market-scroll::-webkit-scrollbar { display: none; }
+    .job-market-slide {
+      flex: 0 0 80%;
+      scroll-snap-align: start;
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .job-market-slide-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .job-market-slide-icon { font-size: 22px; }
+    .job-market-dim-badge {
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .job-market-dim-badge.green { background: #DCFCE7; color: #166534; }
+    .job-market-dim-label { font-weight: 700; font-size: 13px; color: #111827; }
+    .job-market-dim-desc { font-size: 12px; color: #6B7280; line-height: 1.5; }
+    .job-market-hashtag {
+      display: inline-block;
+      background: #EEF2FF;
+      color: #4338CA;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 11px;
+      margin: 2px 2px 0 0;
+    }
+    .job-market-dots {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 6px;
+    }
+    .job-market-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #D1D5DB;
+      transition: background 0.2s;
+    }
+    .job-market-dot.active { background: #6366F1; }
+
+
+    /* ── job_company_rating_card ── */
+    .job-rating-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid #F3F4F6;
+      font-size: 13px;
+    }
+    .job-rating-row:last-of-type { border-bottom: none; }
+    .job-rating-label { color: #374151; font-weight: 500; }
+    .job-rating-stars { display: flex; gap: 4px; cursor: pointer; }
+    .job-rating-star {
+      font-size: 20px;
+      color: #D1D5DB;
+      transition: color 0.15s;
+      user-select: none;
+    }
+    .job-rating-star.active { color: #F59E0B; }
+    .job-rating-submit {
+      width: 100%;
+      margin-top: 12px;
+      padding: 8px;
+      background: var(--orange);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      opacity: 0.4;
+    }
+    .job-rating-submit.ready { opacity: 1; }
+
+    /* ── job_triple_chart ── */
+    .job-triple-chart-wrap { width: 100%; }
+    .job-triple-bar-row {
+      margin-bottom: 14px;
+    }
+    .job-triple-bar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+    .job-triple-bars { display: flex; flex-direction: column; gap: 4px; }
+    .job-triple-bar-line { display: flex; align-items: center; gap: 8px; }
+    .job-triple-bar-name { font-size: 11px; color: #6B7280; width: 90px; flex-shrink: 0; }
+    .job-triple-bar-track {
+      flex: 1; height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden;
+    }
+    .job-triple-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+    .job-triple-insight {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #FEF3C7;
+      border-left: 3px solid #F59E0B;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #92400E;
+      line-height: 1.6;
+    }
+    .job-triple-legend {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+    }
+    .job-triple-legend-item {
+      display: flex; align-items: center; gap: 4px; font-size: 11px; color: #6B7280;
+    }
+    .job-triple-legend-dot {
+      width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0;
+    }
+
+    /* ── job_personal_card ── */
+    .job-personal-dim {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid #F3F4F6;
+      font-size: 13px;
+    }
+    .job-personal-dim:last-child { border-bottom: none; }
+    .job-personal-dim.locked { opacity: 0.5; }
+    .job-personal-dim-label { color: #374151; font-weight: 500; }
+    .job-personal-dim-scores { color: #6B7280; font-size: 12px; }
+    .job-personal-dim-scores.locked-text { color: #9CA3AF; font-style: italic; }
+    .dim-sep { margin: 0 4px; }
+    .job-personal-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .job-personal-badge {
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+
+    /* ── job_personal_health_card ── */
+    .job-health-dims {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .job-health-dim {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: white;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 12px;
+      color: #374151;
+      border: 1px solid #E5E7EB;
+    }
+    .job-health-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .job-connect-cta {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid var(--orange);
+      border-radius: 4px;
+      background: var(--c--color-orange-100);
+      color: var(--orange);
+      cursor: pointer;
+      font-size: var(--c--font-size-xs);
+      font-weight: var(--c--font-weight-semibold);
+      transition: all 0.2s;
+    }
+
+    .job-connect-cta:hover {
+      background: var(--orange);
+      color: white;
+    }
+
+    /* CoT Animation */
+    .cot-thinking {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      background: var(--c--color-cool-grey-100);
+      border-radius: 12px;
+      align-self: flex-start;
+      max-width: 85%;
+      margin: 4px 0;
+    }
+
+    .cot-phase {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: var(--c--font-size-sm);
+      color: var(--c--color-grey-800);
+    }
+
+    .cot-spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--c--color-grey-300);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .cot-bar {
+      height: 4px;
+      background: linear-gradient(90deg, var(--c--color-grey-300) 0%, var(--orange) 50%, var(--c--color-grey-300) 100%);
+      border-radius: 2px;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* Toast */
+    .toast-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--c--color-white);
+      color: var(--c--color-grey-1200);
+      padding: 12px 16px;
+      border-radius: var(--c--radius-md);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-size: var(--c--font-size-sm);
+      z-index: 1000;
+      animation: toastSlide 0.3s ease-out;
+    }
+
+    @keyframes toastSlide {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--c--color-white);
+      border-radius: var(--c--radius-lg);
+      padding: 20px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--c--color-grey-100);
+    }
+
+    .modal-title {
+      font-size: var(--c--font-size-lg);
+      font-weight: var(--c--font-weight-semibold);
+      color: var(--c--color-grey-1200);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--c--color-grey-600);
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--c--color-grey-1200);
+    }
+
+    .modal-code {
+      background: var(--coolGray02);
+      border: 1px solid var(--c--color-grey-100);
+      border-radius: var(--c--radius-sm);
+      padding: 12px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      color: var(--c--color-grey-1200);
+      max-height: 400px;
+      overflow: auto;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .modal-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--c--color-grey-300);
+      border-radius: var(--c--radius-sm);
+      background: var(--c--color-white);
+      cursor: pointer;
+      font-size: var(--c--font-size-sm);
+      font-weight: var(--c--font-weight-medium);
+      color: var(--c--color-grey-1200);
+      transition: all 0.2s;
+    }
+
+    .modal-btn.primary {
+      background: var(--orange);
+      color: white;
+      border-color: var(--orange);
+    }
+
+    .modal-btn:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .modal-btn.primary:hover {
+      background: var(--c--color-orange-800);
+      border-color: var(--c--color-orange-800);
+    }
+
+    /* Footer */
+    .sandbox-footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--c--color-grey-600);
+      font-size: var(--c--font-size-xs);
+      border-top: 1px solid var(--c--color-grey-100);
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--c--color-grey-300);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--c--color-grey-500);
+    }
+  
+    /* === MOBILE PREVIEW OVERRIDES === */
+    body { background: #f0f0f0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 24px 16px; }
+    .sandbox-header { display: none !important; }
+    .sandbox-sidebar { display: none !important; }
+    .sandbox-footer { display: none !important; }
+    .modal-overlay { display: none !important; }
+    #outlinePanel { display: none !important; }
+    .sandbox-content { background: transparent; border: none; box-shadow: none; padding: 0; width: 100%; max-width: 430px; }
+    .content-panel { display: none; }
+    #dialoguePanel { display: flex !important; flex-direction: column; }
+    .dialogue-container { flex: 1; display: flex; }
+    .agent-sidebar { 
+      width: 100% !important; 
+      max-width: 430px !important; 
+      min-width: unset !important;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      height: calc(100vh - 48px);
+      max-height: 860px;
+    }
+    /* 隱藏 nodeSelect 和 resetBtn（sandbox 專用） */
+    #nodeSelect, #resetBtn { display: none !important; }
+
+  </style>
+</head>
+<body data-persona="patrick">
+  <!-- Header -->
+  <div class="sandbox-header">
+    <div class="sandbox-title">🔧 工作燈號腳本沙盒</div>
+    <select id="personaSelect" style="display:none;">
+    </select>
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="outline">大綱模式</button>
+      <button class="mode-btn" data-mode="dialogue">對話模式</button>
+    </div>
+    <div class="header-controls">
+      <select class="header-select" id="nodeSelect" style="display: none;">
+        <option value="">跳轉到節點...</option>
+      </select>
+      <button class="header-btn" id="resetBtn" style="display: none;">↻ 重新開始</button>
+      <button class="header-btn" id="exportBtn">⬇️ 導出腳本</button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="sandbox-container">
+    <!-- Sidebar -->
+    <div class="sandbox-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">情境設定</div>
+        <div class="sidebar-toggle">
+          <input type="checkbox" disabled>
+          <label>自訂角色</label>
+        </div>
+        <div class="sidebar-toggle">
+          <input type="checkbox" disabled>
+          <label>AI 速度調整</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="sandbox-content">
+      <!-- Outline Mode -->
+      <div class="content-panel active" id="outlinePanel">
+        <div class="outline-grid" id="outlineGrid"></div>
+      </div>
+
+      <!-- Dialogue Mode -->
+      <div class="content-panel" id="dialoguePanel">
+        <div class="dialogue-container">
+          <div class="agent-sidebar">
+
+            <!-- 模擬 Header -->
+            <div class="sim-header">
+              <div class="sim-header-logo">
+                <svg width="157" height="22" viewBox="0 0 157 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24.2502 10.9988V11.0005H28.1285V10.9988C28.1285 4.92246 23.2062 0.000110626 17.1317 0.000110626C13.1608 0.000110626 9.69712 2.10732 7.76189 5.25504V0.000110626H3.88007L0 3.88282H3.88007V21.9975H7.76189V16.7391C6.73535 15.0666 6.13217 13.1043 6.13217 11.0005C6.13217 8.71265 6.98587 6.62726 8.38602 5.03332C8.42006 4.99579 8.45585 4.95476 8.49164 4.91722C8.6863 4.70074 8.89056 4.49735 9.10529 4.30182C9.14981 4.26254 9.19258 4.22326 9.23623 4.18223C9.47191 3.97797 9.7172 3.78157 9.97296 3.60087C9.99478 3.58691 10.014 3.57032 10.0341 3.55461C10.3204 3.35646 10.6189 3.17227 10.9288 3.00729C10.941 3.00031 10.9541 2.99507 10.9663 2.98809C11.2439 2.84144 11.5337 2.7105 11.8288 2.59266C11.9178 2.55687 12.006 2.52632 12.0967 2.49402C12.3237 2.41022 12.5515 2.3369 12.7872 2.27405C12.8963 2.24349 13.0054 2.21469 13.1163 2.1885C13.352 2.13438 13.5903 2.08986 13.8303 2.05407C13.9325 2.03836 14.0346 2.02003 14.1411 2.00606C14.485 1.96678 14.8333 1.94147 15.1877 1.94147C15.7149 1.94147 16.2291 1.99297 16.731 2.07939C16.7956 2.09161 16.8637 2.09423 16.9274 2.10819C17.0147 2.12565 17.0976 2.15097 17.1832 2.1693C17.933 2.33777 18.6514 2.59179 19.3157 2.93309C19.3192 2.93484 19.3209 2.93659 19.3244 2.93833C19.568 3.06316 19.8071 3.19933 20.0384 3.34773C20.0594 3.36169 20.076 3.37479 20.0961 3.3905C20.3073 3.52668 20.5159 3.66983 20.715 3.82521C20.7342 3.83918 20.749 3.85402 20.7665 3.86624C20.9655 4.02336 21.1601 4.1866 21.3461 4.35856C21.3635 4.37253 21.3766 4.39086 21.3923 4.40482C21.5783 4.57853 21.7572 4.75748 21.9257 4.9469C21.944 4.96873 21.9615 4.99317 21.9798 5.01324C22.1439 5.19917 22.3001 5.3886 22.4485 5.58762C22.5114 5.67142 22.5664 5.76308 22.6275 5.85037C22.7226 5.99003 22.8239 6.12621 22.9138 6.27111C23.0046 6.42125 23.0823 6.57925 23.1678 6.73288C23.2141 6.82104 23.2682 6.90834 23.3127 7.00087C23.3983 7.17283 23.4716 7.35178 23.5449 7.53247C23.579 7.61103 23.6182 7.6861 23.6488 7.76815C23.7439 8.02217 23.8295 8.28143 23.9028 8.54592C23.9063 8.55465 23.9098 8.56076 23.9115 8.57123C24.0634 9.11855 24.1656 9.6842 24.2118 10.269C24.238 10.51 24.2502 10.7518 24.2502 10.9988" fill="#686868"></path>
+        <path d="M42.3252 0V14.2324H46.8535V17.4688H42.3242V22H38.4482V17.4688H24.209L41.6797 0H42.3252ZM31.9746 14.2324H38.4482V7.76758L31.9746 14.2324Z" fill="#686868"></path>
+        <path d="M24.2095 17.4667L27.7116 13.9646C27.9779 13.0183 28.128 12.0276 28.128 10.9984H24.2514C24.2514 14.9265 21.0671 18.1144 17.1337 18.1144C13.1987 18.1144 10.0178 14.9265 10.0178 10.9984C10.0178 7.06856 13.1987 3.88068 17.1337 3.88068C20.8183 3.88068 23.8464 6.68011 24.2139 10.2652C23.8403 5.60905 19.9497 1.94194 15.1898 1.94194C10.1845 1.94194 6.13336 5.99749 6.13336 10.9984C6.13336 17.0713 11.0557 21.9988 17.1329 21.9988C20.7868 21.9988 24.014 20.2102 26.0138 17.4676H24.2095V17.4667Z" fill="#FF7800"></path>
+        <path d="M60.5676 15.1665C59.0025 17.698 56.7931 19.9152 53.9387 21.8181L52.3736 20.322C58.6655 16.7779 61.9031 10.4947 62.0873 1.4723V0.160316H64.1814V1.4723C64.1814 1.7787 64.1736 2.07898 64.1587 2.36966H64.1814C64.2416 5.07132 64.6266 7.36446 65.3319 9.25169C66.6814 13.1798 69.5672 16.9621 73.9859 20.5987L72.2366 21.8644C71.1009 20.8213 70.1425 19.9003 69.3595 19.1025C66.3366 16.0185 64.2652 12.6115 63.1453 8.88333C62.5316 11.1695 61.6727 13.2645 60.5676 15.1665Z" fill="#686868"></path>
+        <path d="M80.6619 5.2456V3.22045H88.2352V0.136448H90.421V3.22045H99.8816C100.05 3.22045 100.189 3.251 100.296 3.3121C100.541 3.46573 100.665 3.81839 100.665 4.37094C100.649 7.70023 100.61 10.6402 100.548 13.1865C100.411 17.4978 99.6275 20.1218 98.2012 21.0584C96.8971 21.9331 94.4503 21.8562 90.8601 20.828L90.7684 18.3882C94.006 19.4313 96.0844 19.6312 97.0053 18.987C97.3885 18.7111 97.7264 18.1507 98.0179 17.3066C98.2937 16.4014 98.4561 14.9279 98.5024 12.8879C98.594 8.1009 98.5862 5.60699 98.4788 5.40796C98.4177 5.30147 98.3339 5.24647 98.2265 5.24647H90.3311C90.1469 7.79363 89.549 10.4324 88.5355 13.1638C87.001 16.6162 84.6685 19.4243 81.5383 21.5874L79.9051 20.0449C85.0299 17.0063 87.777 12.0735 88.1453 5.2456H80.6619Z" fill="#686868"></path>
+        <path d="M127.318 0.574966C127.701 0.575096 127.893 0.759462 127.893 1.1277V10.7254C127.877 11.1239 127.678 11.3229 127.294 11.323H123.61C123.702 12.6734 123.895 13.8092 124.187 14.7293C125.675 13.9166 126.841 13.1792 127.686 12.5193L128.698 14.0623C127.686 14.8444 126.434 15.6355 124.945 16.4334C125.927 17.9679 127.364 19.3794 129.251 20.6677L127.594 21.9334C125.845 20.5527 124.879 19.6778 124.694 19.3093C122.884 17.2528 121.886 14.5911 121.702 11.322H119.698V19.2859C121.018 18.9481 122.147 18.5871 123.083 18.2039L123.635 20.0447C121.732 20.8119 119.369 21.4342 116.546 21.9099L116.108 20.0222C116.676 19.9149 117.237 19.8159 117.789 19.7234V1.1277C117.789 0.759351 117.973 0.574986 118.342 0.574966H127.318ZM115.971 7.64137H113.162V10.0574H116.614V11.8757H113.162V18.5496C114.804 18.1812 115.887 17.9277 116.409 17.7898L116.73 19.655C112.572 20.5759 109.595 21.128 107.8 21.3113L107.616 19.4246C108.736 19.2867 109.948 19.1167 111.252 18.9177V11.8767H108.03V10.0584H111.252V7.64137H108.675V5.82301H115.971V7.64137ZM109.663 13.0955C110.062 15.29 110.286 16.9012 110.332 17.9295L108.513 17.9978C108.452 16.5244 108.237 14.9601 107.868 13.3025L109.663 13.0955ZM116.407 13.3035C116.162 14.7611 115.892 16.0191 115.601 17.0779L113.968 16.5486C114.397 15.1372 114.658 13.9168 114.75 12.8894L116.407 13.3035ZM119.698 9.50465H125.683C125.882 9.50454 125.982 9.40533 125.982 9.20583V6.90309H119.698V9.50465ZM114.036 0.367935C113.99 0.491016 113.937 0.606166 113.875 0.712662C114.95 1.5105 116.045 2.25559 117.166 2.94606L115.809 4.44215C114.811 3.70555 113.875 2.93808 113.001 2.1404C112.142 3.19918 110.814 4.32565 109.019 5.52321L107.339 4.28004C109.809 2.94538 111.436 1.60307 112.219 0.252701L114.036 0.367935ZM120.158 2.39235C119.851 2.40815 119.698 2.56091 119.698 2.85231V5.08571H125.982V2.82985C125.967 2.53917 125.814 2.39235 125.522 2.39235H120.158Z" fill="#686868"></path>
+        <path d="M156.802 8.65321H153.119V19.2411C153.103 20.1305 152.751 20.8065 152.061 21.2665C150.787 22.0949 148.47 22.018 145.109 21.036L145.155 18.9413C146.352 19.294 147.527 19.5704 148.678 19.7694C149.706 19.8925 150.449 19.762 150.91 19.3788C151.048 19.2557 151.117 19.0327 151.117 18.7108V8.65321H142.694V6.65126H156.802V8.65321ZM141.82 6.83485C141.207 8.07788 140.614 9.14457 140.047 10.0341V21.8183H138.046V12.6356C137.493 13.2039 136.977 13.6946 136.502 14.1093L134.869 12.8192C137.171 10.9015 138.881 8.63055 140.001 6.00673L141.82 6.83485ZM140.99 0.781142C139.763 3.72722 138.343 5.91448 136.732 7.34169L135.028 6.16688C136.885 4.49441 138.25 2.46173 139.125 0.0682516L140.99 0.781142ZM155.882 3.12978H143.431V1.12685H155.882V3.12978Z" fill="#686868"></path>
+      </svg>
+              </div>
+              <div class="sim-header-spacer"></div>
+              <div class="sim-header-avatar">P</div>
+            </div>
+
+            <!-- 模擬 TabBar -->
+            <div class="sim-tabbar">
+              <div class="sim-tab">求職</div>
+              <div class="sim-tab active">職涯</div>
+            </div>
+
+            <!-- 模擬 HealthBanner -->
+            <div class="sim-health-banner">
+              <div class="sim-health-home">
+                <span class="sim-health-home-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_1713_2356)"><path d="M10 5.21529L14 8.92118V15.3529H12.4V10.4118H7.6V15.3529H6V8.92118L10 5.21529ZM10 3L2 10.4118H4.4V17H9.2V12.0588H10.8V17H15.6V10.4118H18L10 3Z" fill="#F2F4F7"/></g><defs><clipPath id="clip0_1713_2356"><rect width="20" height="20" fill="white"/></clipPath></defs></svg></span>
+                <span class="sim-health-home-label">首頁</span>
+              </div>
+              <div class="sim-health-sep"></div>
+              <div class="sim-health-item active-theme">
+                <div class="sim-health-dot"><svg class="health-icon" width="42" height="38" viewBox="0 0 42 38" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#wyclip)"><g filter="url(#wyf0)"><path d="M24.5 36.1C32.232 36.1 38.5 29.6081 38.5 21.6C38.5 13.5919 32.232 7.10001 24.5 7.10001C16.768 7.10001 10.5 13.5919 10.5 21.6C10.5 29.6081 16.768 36.1 24.5 36.1Z" fill="#FFE607"></path></g><path d="M9.0166 2.84415C14.5686 0.178506 19.0477 1.50888 22.1514 3.50626C23.7069 4.50735 24.9168 5.67684 25.7383 6.59708C25.9711 6.85789 26.1719 7.09939 26.3408 7.30997C25.9851 7.16261 25.5397 7.01333 25.0127 6.90665C23.6284 6.62648 21.6949 6.63798 19.374 7.70255L18.9043 7.93008C13.3993 10.7321 11.6042 14.4352 11.0947 17.6566C10.8415 19.2579 10.9069 20.7318 10.9795 21.894C11.0161 22.4795 11.0533 22.9751 11.0557 23.3783C11.0581 23.7924 11.0211 24.052 10.9463 24.1938C10.744 24.5766 10.57 24.7052 10.459 24.7416C10.3605 24.7738 10.2553 24.7513 10.1309 24.6625C10.0041 24.572 9.88904 24.4332 9.80176 24.3061C9.75935 24.2443 9.72565 24.1883 9.70312 24.1488C9.69199 24.1293 9.68313 24.1141 9.67773 24.1039L9.64551 24.0395L9.60059 24.0043L8.15918 22.894C4.96442 20.4274 2.18887 18.0733 1.7959 13.8393L1.7627 13.3607C1.523 8.49476 4.7977 4.87043 9.0166 2.84317V2.84415Z" fill="url(#wypaint0)"></path><path d="M9.0166 2.84415C14.5686 0.178506 19.0477 1.50888 22.1514 3.50626C23.7069 4.50735 24.9168 5.67684 25.7383 6.59708C25.9711 6.85789 26.1719 7.09939 26.3408 7.30997C25.9851 7.16261 25.5397 7.01333 25.0127 6.90665C23.6284 6.62648 21.6949 6.63798 19.374 7.70255L18.9043 7.93008C13.3993 10.7321 11.6042 14.4352 11.0947 17.6566C10.8415 19.2579 10.9069 20.7318 10.9795 21.894C11.0161 22.4795 11.0533 22.9751 11.0557 23.3783C11.0581 23.7924 11.0211 24.052 10.9463 24.1938C10.744 24.5766 10.57 24.7052 10.459 24.7416C10.3605 24.7738 10.2553 24.7513 10.1309 24.6625C10.0041 24.572 9.88904 24.4332 9.80176 24.3061C9.75935 24.2443 9.72565 24.1883 9.70312 24.1488C9.69199 24.1293 9.68313 24.1141 9.67773 24.1039L9.64551 24.0395L9.60059 24.0043L8.15918 22.894C4.96442 20.4274 2.18887 18.0733 1.7959 13.8393L1.7627 13.3607C1.523 8.49476 4.7977 4.87043 9.0166 2.84317V2.84415Z" fill="url(#wypaint1)"></path><path d="M9.0166 2.84415C14.5686 0.178506 19.0477 1.50888 22.1514 3.50626C23.7069 4.50735 24.9168 5.67684 25.7383 6.59708C25.9711 6.85789 26.1719 7.09939 26.3408 7.30997C25.9851 7.16261 25.5397 7.01333 25.0127 6.90665C23.6284 6.62648 21.6949 6.63798 19.374 7.70255L18.9043 7.93008C13.3993 10.7321 11.6042 14.4352 11.0947 17.6566C10.8415 19.2579 10.9069 20.7318 10.9795 21.894C11.0161 22.4795 11.0533 22.9751 11.0557 23.3783C11.0581 23.7924 11.0211 24.052 10.9463 24.1938C10.744 24.5766 10.57 24.7052 10.459 24.7416C10.3605 24.7738 10.2553 24.7513 10.1309 24.6625C10.0041 24.572 9.88904 24.4332 9.80176 24.3061C9.75935 24.2443 9.72565 24.1883 9.70312 24.1488C9.69199 24.1293 9.68313 24.1141 9.67773 24.1039L9.64551 24.0395L9.60059 24.0043L8.15918 22.894C4.96442 20.4274 2.18887 18.0733 1.7959 13.8393L1.7627 13.3607C1.523 8.49476 4.7977 4.87043 9.0166 2.84317V2.84415Z" stroke="#5E5E5E" stroke-width="0.5"></path><path d="M24.504 36.9972C32.9976 36.9972 39.883 30.0541 39.883 21.4893C39.883 12.9245 32.9976 5.98135 24.504 5.98135C16.0104 5.98135 9.125 12.9245 9.125 21.4893C9.125 30.0541 16.0104 36.9972 24.504 36.9972Z" fill="#1C1C1C"></path><path d="M24.5039 6.48135C32.7174 6.48135 39.3827 13.1966 39.3828 21.4892C39.3828 29.7818 32.7174 36.497 24.5039 36.497C16.2904 36.4969 9.625 29.7817 9.625 21.4892C9.62506 13.1967 16.2905 6.4814 24.5039 6.48135Z" fill="#FFEE00" stroke="#3B3B3B"></path><path d="M24.5752 8.00333C32.3993 8.00347 38.6963 14.1214 38.6963 21.6127C38.6961 29.1039 32.3992 35.221 24.5752 35.2211C16.7511 35.2211 10.4534 29.104 10.4531 21.6127C10.4531 14.1213 16.7509 8.00333 24.5752 8.00333Z" stroke="url(#wypaint2)" stroke-width="1.5"></path><g filter="url(#wyf1)"><path d="M32.4925 21.0722C31.0629 22.694 30.8617 19.3903 28.6992 17.4842C26.5367 15.578 23.2318 15.7912 24.6615 14.1694C26.0911 12.5475 29.003 12.778 31.1655 14.6841C33.328 16.5903 33.9221 19.4503 32.4925 21.0722Z" fill="#FFFAA5"></path></g><path d="M26.2434 35.2228C33.2186 34.228 38.0965 27.9763 37.1385 21.2594C34.0866 27.4019 29.8341 30.237 24.1644 30.237C16.9211 30.237 13.4311 26.8623 11.8789 24.8622C12.8369 31.5791 19.2681 36.2177 26.2434 35.2228Z" fill="url(#wypaint3)"></path><path d="M18.4844 1.5336C18.4844 1.5336 21.7108 1.96794 29.5615 6.3059C37.4121 10.6439 39.8042 12.7282 40.4245 21.0544C40.7469 25.3924 39.4574 24.3079 39.4574 24.3079C39.4574 24.3079 37.7372 23.6577 37.5205 20.4043C37.3038 17.1508 31.8208 17.6917 30.9593 14.9818C30.0979 12.272 26.7658 5.00287 18.4844 1.5336Z" fill="url(#wypaint4)"></path></g><defs><filter id="wyf0" x="7.5" y="4.10001" width="34" height="35" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="1.5" result="effect1_foregroundBlur"></fegaussianblur></filter><filter id="wyf1" x="22.3139" y="11.089" width="12.9574" height="12.4176" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="0" result="effect1_foregroundBlur"></fegaussianblur></filter><lineargradient id="wypaint0" x1="7.14103" y1="4.17693" x2="16.8846" y2="21.6128" gradientUnits="userSpaceOnUse"><stop stop-color="#4F4F4F"></stop><stop offset="1" stop-color="#BD7E18"></stop></lineargradient><radialgradient id="wypaint1" cx="0" cy="0" r="1" gradientTransform="matrix(8.20513 9.23077 -9.92012 6.07694 6.6282 4.17643)" gradientUnits="userSpaceOnUse"><stop stop-color="#C47C07"></stop><stop offset="1" stop-color="#5A4A05"></stop></radialgradient><lineargradient id="wypaint2" x1="21.9192" y1="36.4841" x2="21.4241" y2="8.79114" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFBB7"></stop><stop offset="1" stop-color="#FFF200"></stop></lineargradient><lineargradient id="wypaint3" x1="20.384" y1="34.4895" x2="36.4491" y2="25.5119" gradientUnits="userSpaceOnUse"><stop stop-color="#F6EA07"></stop><stop offset="1" stop-color="#D7CD11"></stop></lineargradient><lineargradient id="wypaint4" x1="47.1422" y1="23.1502" x2="30.732" y2="1.61172" gradientUnits="userSpaceOnUse"><stop stop-color="#8D8246"></stop><stop offset="1"></stop></lineargradient><clippath id="wyclip"><rect width="42" height="38" fill="white"></rect></clippath></defs></svg></div>
+                <div class="sim-health-info">
+                  <div class="sim-health-name">工作健康</div>
+                  <div class="sim-health-level">潛力無窮</div>
+                </div>
+              </div>
+              <div class="sim-health-sep"></div>
+              <div class="sim-health-item">
+                <div class="sim-health-dot"><svg class="health-icon" width="42" height="38" viewBox="0 0 42 38" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#yclip)"><g filter="url(#yf0)"><path d="M24.5 36.1C32.232 36.1 38.5 29.6081 38.5 21.6C38.5 13.5919 32.232 7.10001 24.5 7.10001C16.768 7.10001 10.5 13.5919 10.5 21.6C10.5 29.6081 16.768 36.1 24.5 36.1Z" fill="#FFE607"></path></g><path d="M9.0166 2.84415C14.5686 0.178506 19.0477 1.50888 22.1514 3.50626C23.7069 4.50735 24.9168 5.67684 25.7383 6.59708C25.9711 6.85789 26.1719 7.09939 26.3408 7.30997C25.9851 7.16261 25.5397 7.01333 25.0127 6.90665C23.6284 6.62648 21.6949 6.63798 19.374 7.70255L18.9043 7.93008C13.3993 10.7321 11.6042 14.4352 11.0947 17.6566C10.8415 19.2579 10.9069 20.7318 10.9795 21.894C11.0161 22.4795 11.0533 22.9751 11.0557 23.3783C11.0581 23.7924 11.0211 24.052 10.9463 24.1938C10.744 24.5766 10.57 24.7052 10.459 24.7416C10.3605 24.7738 10.2553 24.7513 10.1309 24.6625C10.0041 24.572 9.88904 24.4332 9.80176 24.3061C9.75935 24.2443 9.72565 24.1883 9.70312 24.1488C9.69199 24.1293 9.68313 24.1141 9.67773 24.1039L9.64551 24.0395L9.60059 24.0043L8.15918 22.894C4.96442 20.4274 2.18887 18.0733 1.7959 13.8393L1.7627 13.3607C1.523 8.49476 4.7977 4.87043 9.0166 2.84317V2.84415Z" fill="url(#ypaint0)"></path><path d="M9.0166 2.84415C14.5686 0.178506 19.0477 1.50888 22.1514 3.50626C23.7069 4.50735 24.9168 5.67684 25.7383 6.59708C25.9711 6.85789 26.1719 7.09939 26.3408 7.30997C25.9851 7.16261 25.5397 7.01333 25.0127 6.90665C23.6284 6.62648 21.6949 6.63798 19.374 7.70255L18.9043 7.93008C13.3993 10.7321 11.6042 14.4352 11.0947 17.6566C10.8415 19.2579 10.9069 20.7318 10.9795 21.894C11.0161 22.4795 11.0533 22.9751 11.0557 23.3783C11.0581 23.7924 11.0211 24.052 10.9463 24.1938C10.744 24.5766 10.57 24.7052 10.459 24.7416C10.3605 24.7738 10.2553 24.7513 10.1309 24.6625C10.0041 24.572 9.88904 24.4332 9.80176 24.3061C9.75935 24.2443 9.72565 24.1883 9.70312 24.1488C9.69199 24.1293 9.68313 24.1141 9.67773 24.1039L9.64551 24.0395L9.60059 24.0043L8.15918 22.894C4.96442 20.4274 2.18887 18.0733 1.7959 13.8393L1.7627 13.3607C1.523 8.49476 4.7977 4.87043 9.0166 2.84317V2.84415Z" fill="url(#ypaint1)"></path><path d="M9.0166 2.84415C14.5686 0.178506 19.0477 1.50888 22.1514 3.50626C23.7069 4.50735 24.9168 5.67684 25.7383 6.59708C25.9711 6.85789 26.1719 7.09939 26.3408 7.30997C25.9851 7.16261 25.5397 7.01333 25.0127 6.90665C23.6284 6.62648 21.6949 6.63798 19.374 7.70255L18.9043 7.93008C13.3993 10.7321 11.6042 14.4352 11.0947 17.6566C10.8415 19.2579 10.9069 20.7318 10.9795 21.894C11.0161 22.4795 11.0533 22.9751 11.0557 23.3783C11.0581 23.7924 11.0211 24.052 10.9463 24.1938C10.744 24.5766 10.57 24.7052 10.459 24.7416C10.3605 24.7738 10.2553 24.7513 10.1309 24.6625C10.0041 24.572 9.88904 24.4332 9.80176 24.3061C9.75935 24.2443 9.72565 24.1883 9.70312 24.1488C9.69199 24.1293 9.68313 24.1141 9.67773 24.1039L9.64551 24.0395L9.60059 24.0043L8.15918 22.894C4.96442 20.4274 2.18887 18.0733 1.7959 13.8393L1.7627 13.3607C1.523 8.49476 4.7977 4.87043 9.0166 2.84317V2.84415Z" stroke="#5E5E5E" stroke-width="0.5"></path><path d="M24.504 36.9972C32.9976 36.9972 39.883 30.0541 39.883 21.4893C39.883 12.9245 32.9976 5.98135 24.504 5.98135C16.0104 5.98135 9.125 12.9245 9.125 21.4893C9.125 30.0541 16.0104 36.9972 24.504 36.9972Z" fill="#1C1C1C"></path><path d="M24.5039 6.48135C32.7174 6.48135 39.3827 13.1966 39.3828 21.4892C39.3828 29.7818 32.7174 36.497 24.5039 36.497C16.2904 36.4969 9.625 29.7817 9.625 21.4892C9.62506 13.1967 16.2905 6.4814 24.5039 6.48135Z" fill="#FFEE00" stroke="#3B3B3B"></path><path d="M24.5752 8.00333C32.3993 8.00347 38.6963 14.1214 38.6963 21.6127C38.6961 29.1039 32.3992 35.221 24.5752 35.2211C16.7511 35.2211 10.4534 29.104 10.4531 21.6127C10.4531 14.1213 16.7509 8.00333 24.5752 8.00333Z" stroke="url(#ypaint2)" stroke-width="1.5"></path><g filter="url(#yf1)"><path d="M32.4925 21.0722C31.0629 22.694 30.8617 19.3903 28.6992 17.4842C26.5367 15.578 23.2318 15.7912 24.6615 14.1694C26.0911 12.5475 29.003 12.778 31.1655 14.6841C33.328 16.5903 33.9221 19.4503 32.4925 21.0722Z" fill="#FFFAA5"></path></g><path d="M26.2434 35.2228C33.2186 34.228 38.0965 27.9763 37.1385 21.2594C34.0866 27.4019 29.8341 30.237 24.1644 30.237C16.9211 30.237 13.4311 26.8623 11.8789 24.8622C12.8369 31.5791 19.2681 36.2177 26.2434 35.2228Z" fill="url(#ypaint3)"></path><path d="M18.4844 1.5336C18.4844 1.5336 21.7108 1.96794 29.5615 6.3059C37.4121 10.6439 39.8042 12.7282 40.4245 21.0544C40.7469 25.3924 39.4574 24.3079 39.4574 24.3079C39.4574 24.3079 37.7372 23.6577 37.5205 20.4043C37.3038 17.1508 31.8208 17.6917 30.9593 14.9818C30.0979 12.272 26.7658 5.00287 18.4844 1.5336Z" fill="url(#ypaint4)"></path></g><defs><filter id="yf0" x="7.5" y="4.10001" width="34" height="35" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="1.5" result="effect1_foregroundBlur"></fegaussianblur></filter><filter id="yf1" x="22.3139" y="11.089" width="12.9574" height="12.4176" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="0" result="effect1_foregroundBlur"></fegaussianblur></filter><lineargradient id="ypaint0" x1="7.14103" y1="4.17693" x2="16.8846" y2="21.6128" gradientUnits="userSpaceOnUse"><stop stop-color="#4F4F4F"></stop><stop offset="1" stop-color="#BD7E18"></stop></lineargradient><radialgradient id="ypaint1" cx="0" cy="0" r="1" gradientTransform="matrix(8.20513 9.23077 -9.92012 6.07694 6.6282 4.17643)" gradientUnits="userSpaceOnUse"><stop stop-color="#C47C07"></stop><stop offset="1" stop-color="#5A4A05"></stop></radialgradient><lineargradient id="ypaint2" x1="21.9192" y1="36.4841" x2="21.4241" y2="8.79114" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFBB7"></stop><stop offset="1" stop-color="#FFF200"></stop></lineargradient><lineargradient id="ypaint3" x1="20.384" y1="34.4895" x2="36.4491" y2="25.5119" gradientUnits="userSpaceOnUse"><stop stop-color="#F6EA07"></stop><stop offset="1" stop-color="#D7CD11"></stop></lineargradient><lineargradient id="ypaint4" x1="47.1422" y1="23.1502" x2="30.732" y2="1.61172" gradientUnits="userSpaceOnUse"><stop stop-color="#8D8246"></stop><stop offset="1"></stop></lineargradient><clippath id="yclip"><rect width="42" height="38" fill="white"></rect></clippath></defs></svg></div>
+                <div class="sim-health-info">
+                  <div class="sim-health-name">薪資健康</div>
+                  <div class="sim-health-level">潛力無窮</div>
+                </div>
+              </div>
+              <div class="sim-health-sep"></div>
+              <div class="sim-health-item">
+                <div class="sim-health-dot"><svg class="health-icon" width="42" height="38" viewBox="0 0 42 38" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#aclip)"><g filter="url(#af0)"><path d="M24.5 36.2C32.232 36.2 38.5 29.7081 38.5 21.7C38.5 13.6919 32.232 7.2 24.5 7.2C16.768 7.2 10.5 13.6919 10.5 21.7C10.5 29.7081 16.768 36.2 24.5 36.2Z" fill="#FF0807"></path></g><path d="M9.01953 2.94902C14.5689 0.284798 19.0453 1.61571 22.1475 3.61211C23.7026 4.61293 24.9121 5.78195 25.7334 6.70195C25.9594 6.95514 26.1545 7.1902 26.3203 7.39629C25.9679 7.2518 25.5302 7.10435 25.0137 6.9998C23.5359 6.70072 21.4335 6.73487 18.9023 8.02422C13.3951 10.8273 11.5977 14.5322 11.0879 17.7557C10.8345 19.3576 10.9 20.8318 10.9727 21.9939C11.0093 22.5799 11.0474 23.0753 11.0498 23.4783C11.0523 23.8926 11.0145 24.1506 10.9404 24.2908C10.7385 24.673 10.5658 24.8001 10.457 24.8357C10.3612 24.8671 10.2583 24.8449 10.1348 24.7566C10.0088 24.6666 9.89377 24.5291 9.80664 24.4021C9.76439 24.3406 9.73143 24.2853 9.70898 24.2459C9.69787 24.2264 9.68899 24.2112 9.68359 24.201L9.67676 24.1873L9.65137 24.1346L9.60449 24.0994L8.16309 22.9891C4.96823 20.5223 2.19532 18.1697 1.80273 13.9383L1.76855 13.4607L1.75684 13.0086C1.73483 8.37336 4.93362 4.91238 9.01953 2.94902Z" fill="url(#apaint0)"></path><path d="M9.01953 2.94902C14.5689 0.284798 19.0453 1.61571 22.1475 3.61211C23.7026 4.61293 24.9121 5.78195 25.7334 6.70195C25.9594 6.95514 26.1545 7.1902 26.3203 7.39629C25.9679 7.2518 25.5302 7.10435 25.0137 6.9998C23.5359 6.70072 21.4335 6.73487 18.9023 8.02422C13.3951 10.8273 11.5977 14.5322 11.0879 17.7557C10.8345 19.3576 10.9 20.8318 10.9727 21.9939C11.0093 22.5799 11.0474 23.0753 11.0498 23.4783C11.0523 23.8926 11.0145 24.1506 10.9404 24.2908C10.7385 24.673 10.5658 24.8001 10.457 24.8357C10.3612 24.8671 10.2583 24.8449 10.1348 24.7566C10.0088 24.6666 9.89377 24.5291 9.80664 24.4021C9.76439 24.3406 9.73143 24.2853 9.70898 24.2459C9.69787 24.2264 9.68899 24.2112 9.68359 24.201L9.67676 24.1873L9.65137 24.1346L9.60449 24.0994L8.16309 22.9891C4.96823 20.5223 2.19532 18.1697 1.80273 13.9383L1.76855 13.4607L1.75684 13.0086C1.73483 8.37336 4.93362 4.91238 9.01953 2.94902Z" fill="url(#apaint1)"></path><path d="M9.01953 2.94902C14.5689 0.284798 19.0453 1.61571 22.1475 3.61211C23.7026 4.61293 24.9121 5.78195 25.7334 6.70195C25.9594 6.95514 26.1545 7.1902 26.3203 7.39629C25.9679 7.2518 25.5302 7.10435 25.0137 6.9998C23.5359 6.70072 21.4335 6.73487 18.9023 8.02422C13.3951 10.8273 11.5977 14.5322 11.0879 17.7557C10.8345 19.3576 10.9 20.8318 10.9727 21.9939C11.0093 22.5799 11.0474 23.0753 11.0498 23.4783C11.0523 23.8926 11.0145 24.1506 10.9404 24.2908C10.7385 24.673 10.5658 24.8001 10.457 24.8357C10.3612 24.8671 10.2583 24.8449 10.1348 24.7566C10.0088 24.6666 9.89377 24.5291 9.80664 24.4021C9.76439 24.3406 9.73143 24.2853 9.70898 24.2459C9.69787 24.2264 9.68899 24.2112 9.68359 24.201L9.67676 24.1873L9.65137 24.1346L9.60449 24.0994L8.16309 22.9891C4.96823 20.5223 2.19532 18.1697 1.80273 13.9383L1.76855 13.4607L1.75684 13.0086C1.73483 8.37336 4.93362 4.91238 9.01953 2.94902Z" stroke="#5E5E5E" stroke-width="0.51282"></path><path d="M24.504 37.0972C32.9976 37.0972 39.883 30.1541 39.883 21.5893C39.883 13.0245 32.9976 6.08134 24.504 6.08134C16.0104 6.08134 9.125 13.0245 9.125 21.5893C9.125 30.1541 16.0104 37.0972 24.504 37.0972Z" fill="#1C1C1C"></path><path d="M24.5039 6.59404C32.7102 6.59404 39.3701 13.3036 39.3701 21.5892C39.3701 29.8748 32.7102 36.5843 24.5039 36.5843C16.2976 36.5842 9.6377 29.8747 9.6377 21.5892C9.63776 13.3036 16.2977 6.59408 24.5039 6.59404Z" fill="#FF2322" stroke="#4F4F4F" stroke-width="1.02564"></path><path d="M24.5752 8.12285C32.3894 8.12299 38.6777 14.2326 38.6777 21.7127C38.6775 29.1926 32.3892 35.3014 24.5752 35.3016C16.761 35.3016 10.4729 29.1927 10.4727 21.7127C10.4727 14.2325 16.7609 8.12285 24.5752 8.12285Z" stroke="url(#apaint2)" stroke-width="1.53846"></path><g filter="url(#af1)"><path d="M32.5684 21.2898C31.1021 22.9532 30.8957 19.5648 28.6778 17.6098C26.4598 15.6548 23.0702 15.8734 24.5365 14.21C26.0028 12.5465 28.9894 12.7829 31.2073 14.7379C33.4253 16.693 34.0346 19.6263 32.5684 21.2898Z" fill="#FF8888"></path></g><path d="M26.2434 35.3228C33.2186 34.3279 38.0965 28.0763 37.1385 21.3594C34.0866 27.5019 29.8341 30.337 24.1644 30.337C16.9211 30.337 13.4311 26.9622 11.8789 24.9622C12.8369 31.6791 19.2681 36.3177 26.2434 35.3228Z" fill="url(#apaint3)"></path><path d="M18.4844 1.63359C18.4844 1.63359 21.7108 2.06793 29.5615 6.40589C37.4121 10.7439 39.8042 12.8282 40.4245 21.1544C40.7469 25.4924 39.4574 24.4079 39.4574 24.4079C39.4574 24.4079 37.7372 23.7577 37.5205 20.5043C37.3038 17.2508 31.8208 17.7917 30.9593 15.0818C30.0979 12.372 26.7658 5.10287 18.4844 1.63359Z" fill="url(#apaint4)"></path></g><defs><filter id="af0" x="7.5" y="4.2" width="34" height="35" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="1.5" result="effect1_foregroundBlur"></fegaussianblur></filter><filter id="af1" x="22.1288" y="11.0506" width="13.2896" height="12.736" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="0" result="effect1_foregroundBlur"></fegaussianblur></filter><lineargradient id="apaint0" x1="7.14103" y1="4.27692" x2="16.8846" y2="21.7128" gradientUnits="userSpaceOnUse"><stop stop-color="#4F4F4F"></stop><stop offset="1" stop-color="#BD1818"></stop></lineargradient><radialgradient id="apaint1" cx="0" cy="0" r="1" gradientTransform="matrix(9.23077 10.2564 -11.0413 6.85782 5.60256 1.1995)" gradientUnits="userSpaceOnUse"><stop stop-color="#B40807"></stop><stop offset="1" stop-color="#560505"></stop></radialgradient><lineargradient id="apaint2" x1="21.9192" y1="36.5841" x2="21.4241" y2="8.89114" gradientUnits="userSpaceOnUse"><stop stop-color="#FF8E8E"></stop><stop offset="1" stop-color="#FF2322"></stop></lineargradient><lineargradient id="apaint3" x1="20.384" y1="34.5895" x2="36.4491" y2="25.6119" gradientUnits="userSpaceOnUse"><stop stop-color="#D40100"></stop><stop offset="1" stop-color="#FF2322"></stop></lineargradient><lineargradient id="apaint4" x1="47.1422" y1="23.2502" x2="30.732" y2="1.71172" gradientUnits="userSpaceOnUse"><stop stop-color="#7B2121"></stop><stop offset="1" stop-color="#0E0E0E"></stop></lineargradient><clippath id="aclip"><rect width="42" height="38" fill="white"></rect></clippath></defs></svg></div>
+                <div class="sim-health-info">
+                  <div class="sim-health-name">能力健康</div>
+                  <div class="sim-health-level">大有可為</div>
+                </div>
+              </div>
+              <div class="sim-health-sep"></div>
+              <div class="sim-health-item">
+                <div class="sim-health-dot"><svg class="health-icon" width="42" height="38" viewBox="0 0 42 38" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#gclipg2)"><g filter="url(#gf0g2)"><path d="M24.5 36.1C32.232 36.1 38.5 29.6081 38.5 21.6C38.5 13.5919 32.232 7.10001 24.5 7.10001C16.768 7.10001 10.5 13.5919 10.5 21.6C10.5 29.6081 16.768 36.1 24.5 36.1Z" fill="#18FF07"></path></g><path d="M9.0166 2.84415C14.5686 0.178506 19.0477 1.50888 22.1514 3.50626C23.7069 4.50735 24.9168 5.67684 25.7383 6.59708C25.9711 6.85789 26.1719 7.09939 26.3408 7.30997C25.9851 7.16261 25.5397 7.01333 25.0127 6.90665C23.6284 6.62648 21.6949 6.63798 19.374 7.70255L18.9043 7.93008C13.3993 10.7321 11.6042 14.4352 11.0947 17.6566C10.8415 19.2579 10.9069 20.7318 10.9795 21.894C11.0161 22.4795 11.0533 22.9751 11.0557 23.3783C11.0581 23.7924 11.0211 24.052 10.9463 24.1938C10.744 24.5766 10.57 24.7052 10.459 24.7416C10.3605 24.7738 10.2553 24.7513 10.1309 24.6625C10.0041 24.572 9.88904 24.4332 9.80176 24.3061C9.75935 24.2443 9.72565 24.1883 9.70312 24.1488C9.69199 24.1293 9.68313 24.1141 9.67773 24.1039L9.64551 24.0395L9.60059 24.0043L8.15918 22.894C4.96442 20.4274 2.18887 18.0733 1.7959 13.8393L1.7627 13.3607C1.523 8.49476 4.7977 4.87043 9.0166 2.84317V2.84415Z" fill="url(#gpaint0g2)" stroke="#5E5E5E" stroke-width="0.5"></path><path d="M24.504 36.9972C32.9976 36.9972 39.883 30.0541 39.883 21.4893C39.883 12.9245 32.9976 5.98135 24.504 5.98135C16.0104 5.98135 9.125 12.9245 9.125 21.4893C9.125 30.0541 16.0104 36.9972 24.504 36.9972Z" fill="#1C1C1C"></path><path d="M24.5039 6.48135C32.7174 6.48135 39.3827 13.1966 39.3828 21.4892C39.3828 29.7818 32.7174 36.497 24.5039 36.497C16.2904 36.4969 9.625 29.7817 9.625 21.4892C9.62506 13.1967 16.2905 6.4814 24.5039 6.48135Z" fill="#8AEC01" stroke="#3B3B3B"></path><path d="M24.5752 8.00333C32.3993 8.00347 38.6963 14.1214 38.6963 21.6127C38.6961 29.1039 32.3992 35.221 24.5752 35.2211C16.7511 35.2211 10.4534 29.104 10.4531 21.6127C10.4531 14.1213 16.7509 8.00333 24.5752 8.00333Z" stroke="url(#gpaint2g2)" stroke-width="1.5"></path><g filter="url(#gf1g2)"><path d="M32.4925 21.0722C31.0629 22.694 30.8617 19.3903 28.6992 17.4842C26.5367 15.578 23.2318 15.7912 24.6615 14.1694C26.0911 12.5475 29.003 12.778 31.1655 14.6841C33.328 16.5903 33.9221 19.4503 32.4925 21.0722Z" fill="#BCFF5F"></path></g><path d="M26.2434 35.2228C33.2186 34.228 38.0965 27.9763 37.1385 21.2594C34.0866 27.4019 29.8341 30.237 24.1644 30.237C16.9211 30.237 13.4311 26.8623 11.8789 24.8622C12.8369 31.5791 19.2681 36.2177 26.2434 35.2228Z" fill="url(#gpaint3g2)"></path><path d="M18.4844 1.5336C18.4844 1.5336 21.7108 1.96794 29.5615 6.3059C37.4121 10.6439 39.8042 12.7282 40.4245 21.0544C40.7469 25.3924 39.4574 24.3079 39.4574 24.3079C39.4574 24.3079 37.7372 23.6577 37.5205 20.4043C37.3038 17.1508 31.8208 17.6917 30.9593 14.9818C30.0979 12.272 26.7658 5.00287 18.4844 1.5336Z" fill="url(#gpaint4g2)"></path></g><defs><filter id="gf0g2" x="7.5" y="4.10001" width="34" height="35" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="1.5" result="effect1_foregroundBlur"></fegaussianblur></filter><filter id="gf1g2" x="22.314" y="11.089" width="12.9573" height="12.4176" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="0" result="effect1_foregroundBlur"></fegaussianblur></filter><lineargradient id="gpaint0g2" x1="7.14103" y1="4.17693" x2="16.8846" y2="21.6128" gradientUnits="userSpaceOnUse"><stop stop-color="#4F4F4F"></stop><stop offset="1" stop-color="#4ABD18"></stop></lineargradient><lineargradient id="gpaint2g2" x1="21.9192" y1="36.4841" x2="21.4241" y2="8.79114" gradientUnits="userSpaceOnUse"><stop stop-color="#D8FFA2"></stop><stop offset="1" stop-color="#8AEC01"></stop></lineargradient><lineargradient id="gpaint3g2" x1="20.384" y1="34.4895" x2="36.4491" y2="25.5119" gradientUnits="userSpaceOnUse"><stop stop-color="#78CD00"></stop><stop offset="1" stop-color="#8AEC01"></stop></lineargradient><lineargradient id="gpaint4g2" x1="47.1422" y1="23.1502" x2="30.732" y2="1.61172" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8D46"></stop><stop offset="1"></stop></lineargradient><clippath id="gclipg2"><rect width="42" height="38" fill="white"></rect></clippath></defs></svg></div>
+                <div class="sim-health-info">
+                  <div class="sim-health-name">人脈健康</div>
+                  <div class="sim-health-level">需要關注</div>
+                </div>
+              </div>
+              <div class="sim-health-sep"></div>
+              <div class="sim-health-item">
+                <div class="sim-health-dot"><svg class="health-icon" width="42" height="38" viewBox="0 0 42 38" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#gclipg4)"><g filter="url(#gf0g4)"><path d="M24.5 36.1C32.232 36.1 38.5 29.6081 38.5 21.6C38.5 13.5919 32.232 7.10001 24.5 7.10001C16.768 7.10001 10.5 13.5919 10.5 21.6C10.5 29.6081 16.768 36.1 24.5 36.1Z" fill="#18FF07"></path></g><path d="M9.0166 2.84415C14.5686 0.178506 19.0477 1.50888 22.1514 3.50626C23.7069 4.50735 24.9168 5.67684 25.7383 6.59708C25.9711 6.85789 26.1719 7.09939 26.3408 7.30997C25.9851 7.16261 25.5397 7.01333 25.0127 6.90665C23.6284 6.62648 21.6949 6.63798 19.374 7.70255L18.9043 7.93008C13.3993 10.7321 11.6042 14.4352 11.0947 17.6566C10.8415 19.2579 10.9069 20.7318 10.9795 21.894C11.0161 22.4795 11.0533 22.9751 11.0557 23.3783C11.0581 23.7924 11.0211 24.052 10.9463 24.1938C10.744 24.5766 10.57 24.7052 10.459 24.7416C10.3605 24.7738 10.2553 24.7513 10.1309 24.6625C10.0041 24.572 9.88904 24.4332 9.80176 24.3061C9.75935 24.2443 9.72565 24.1883 9.70312 24.1488C9.69199 24.1293 9.68313 24.1141 9.67773 24.1039L9.64551 24.0395L9.60059 24.0043L8.15918 22.894C4.96442 20.4274 2.18887 18.0733 1.7959 13.8393L1.7627 13.3607C1.523 8.49476 4.7977 4.87043 9.0166 2.84317V2.84415Z" fill="url(#gpaint0g4)" stroke="#5E5E5E" stroke-width="0.5"></path><path d="M24.504 36.9972C32.9976 36.9972 39.883 30.0541 39.883 21.4893C39.883 12.9245 32.9976 5.98135 24.504 5.98135C16.0104 5.98135 9.125 12.9245 9.125 21.4893C9.125 30.0541 16.0104 36.9972 24.504 36.9972Z" fill="#1C1C1C"></path><path d="M24.5039 6.48135C32.7174 6.48135 39.3827 13.1966 39.3828 21.4892C39.3828 29.7818 32.7174 36.497 24.5039 36.497C16.2904 36.4969 9.625 29.7817 9.625 21.4892C9.62506 13.1967 16.2905 6.4814 24.5039 6.48135Z" fill="#8AEC01" stroke="#3B3B3B"></path><path d="M24.5752 8.00333C32.3993 8.00347 38.6963 14.1214 38.6963 21.6127C38.6961 29.1039 32.3992 35.221 24.5752 35.2211C16.7511 35.2211 10.4534 29.104 10.4531 21.6127C10.4531 14.1213 16.7509 8.00333 24.5752 8.00333Z" stroke="url(#gpaint2g4)" stroke-width="1.5"></path><g filter="url(#gf1g4)"><path d="M32.4925 21.0722C31.0629 22.694 30.8617 19.3903 28.6992 17.4842C26.5367 15.578 23.2318 15.7912 24.6615 14.1694C26.0911 12.5475 29.003 12.778 31.1655 14.6841C33.328 16.5903 33.9221 19.4503 32.4925 21.0722Z" fill="#BCFF5F"></path></g><path d="M26.2434 35.2228C33.2186 34.228 38.0965 27.9763 37.1385 21.2594C34.0866 27.4019 29.8341 30.237 24.1644 30.237C16.9211 30.237 13.4311 26.8623 11.8789 24.8622C12.8369 31.5791 19.2681 36.2177 26.2434 35.2228Z" fill="url(#gpaint3g4)"></path><path d="M18.4844 1.5336C18.4844 1.5336 21.7108 1.96794 29.5615 6.3059C37.4121 10.6439 39.8042 12.7282 40.4245 21.0544C40.7469 25.3924 39.4574 24.3079 39.4574 24.3079C39.4574 24.3079 37.7372 23.6577 37.5205 20.4043C37.3038 17.1508 31.8208 17.6917 30.9593 14.9818C30.0979 12.272 26.7658 5.00287 18.4844 1.5336Z" fill="url(#gpaint4g4)"></path></g><defs><filter id="gf0g4" x="7.5" y="4.10001" width="34" height="35" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="1.5" result="effect1_foregroundBlur"></fegaussianblur></filter><filter id="gf1g4" x="22.314" y="11.089" width="12.9573" height="12.4176" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="0" result="effect1_foregroundBlur"></fegaussianblur></filter><lineargradient id="gpaint0g4" x1="7.14103" y1="4.17693" x2="16.8846" y2="21.6128" gradientUnits="userSpaceOnUse"><stop stop-color="#4F4F4F"></stop><stop offset="1" stop-color="#4ABD18"></stop></lineargradient><lineargradient id="gpaint2g4" x1="21.9192" y1="36.4841" x2="21.4241" y2="8.79114" gradientUnits="userSpaceOnUse"><stop stop-color="#D8FFA2"></stop><stop offset="1" stop-color="#8AEC01"></stop></lineargradient><lineargradient id="gpaint3g4" x1="20.384" y1="34.4895" x2="36.4491" y2="25.5119" gradientUnits="userSpaceOnUse"><stop stop-color="#78CD00"></stop><stop offset="1" stop-color="#8AEC01"></stop></lineargradient><lineargradient id="gpaint4g4" x1="47.1422" y1="23.1502" x2="30.732" y2="1.61172" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8D46"></stop><stop offset="1"></stop></lineargradient><clippath id="gclipg4"><rect width="42" height="38" fill="white"></rect></clippath></defs></svg></div>
+                <div class="sim-health-info">
+                  <div class="sim-health-name">身心平衡</div>
+                  <div class="sim-health-level">令人激賞</div>
+                </div>
+              </div>
+              <div class="sim-health-sep"></div>
+              <div class="sim-health-item">
+                <div class="sim-health-dot"><svg class="health-icon" width="42" height="38" viewBox="0 0 42 38" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#gclipg3)"><g filter="url(#gf0g3)"><path d="M24.5 36.1C32.232 36.1 38.5 29.6081 38.5 21.6C38.5 13.5919 32.232 7.10001 24.5 7.10001C16.768 7.10001 10.5 13.5919 10.5 21.6C10.5 29.6081 16.768 36.1 24.5 36.1Z" fill="#18FF07"></path></g><path d="M9.0166 2.84415C14.5686 0.178506 19.0477 1.50888 22.1514 3.50626C23.7069 4.50735 24.9168 5.67684 25.7383 6.59708C25.9711 6.85789 26.1719 7.09939 26.3408 7.30997C25.9851 7.16261 25.5397 7.01333 25.0127 6.90665C23.6284 6.62648 21.6949 6.63798 19.374 7.70255L18.9043 7.93008C13.3993 10.7321 11.6042 14.4352 11.0947 17.6566C10.8415 19.2579 10.9069 20.7318 10.9795 21.894C11.0161 22.4795 11.0533 22.9751 11.0557 23.3783C11.0581 23.7924 11.0211 24.052 10.9463 24.1938C10.744 24.5766 10.57 24.7052 10.459 24.7416C10.3605 24.7738 10.2553 24.7513 10.1309 24.6625C10.0041 24.572 9.88904 24.4332 9.80176 24.3061C9.75935 24.2443 9.72565 24.1883 9.70312 24.1488C9.69199 24.1293 9.68313 24.1141 9.67773 24.1039L9.64551 24.0395L9.60059 24.0043L8.15918 22.894C4.96442 20.4274 2.18887 18.0733 1.7959 13.8393L1.7627 13.3607C1.523 8.49476 4.7977 4.87043 9.0166 2.84317V2.84415Z" fill="url(#gpaint0g3)" stroke="#5E5E5E" stroke-width="0.5"></path><path d="M24.504 36.9972C32.9976 36.9972 39.883 30.0541 39.883 21.4893C39.883 12.9245 32.9976 5.98135 24.504 5.98135C16.0104 5.98135 9.125 12.9245 9.125 21.4893C9.125 30.0541 16.0104 36.9972 24.504 36.9972Z" fill="#1C1C1C"></path><path d="M24.5039 6.48135C32.7174 6.48135 39.3827 13.1966 39.3828 21.4892C39.3828 29.7818 32.7174 36.497 24.5039 36.497C16.2904 36.4969 9.625 29.7817 9.625 21.4892C9.62506 13.1967 16.2905 6.4814 24.5039 6.48135Z" fill="#8AEC01" stroke="#3B3B3B"></path><path d="M24.5752 8.00333C32.3993 8.00347 38.6963 14.1214 38.6963 21.6127C38.6961 29.1039 32.3992 35.221 24.5752 35.2211C16.7511 35.2211 10.4534 29.104 10.4531 21.6127C10.4531 14.1213 16.7509 8.00333 24.5752 8.00333Z" stroke="url(#gpaint2g3)" stroke-width="1.5"></path><g filter="url(#gf1g3)"><path d="M32.4925 21.0722C31.0629 22.694 30.8617 19.3903 28.6992 17.4842C26.5367 15.578 23.2318 15.7912 24.6615 14.1694C26.0911 12.5475 29.003 12.778 31.1655 14.6841C33.328 16.5903 33.9221 19.4503 32.4925 21.0722Z" fill="#BCFF5F"></path></g><path d="M26.2434 35.2228C33.2186 34.228 38.0965 27.9763 37.1385 21.2594C34.0866 27.4019 29.8341 30.237 24.1644 30.237C16.9211 30.237 13.4311 26.8623 11.8789 24.8622C12.8369 31.5791 19.2681 36.2177 26.2434 35.2228Z" fill="url(#gpaint3g3)"></path><path d="M18.4844 1.5336C18.4844 1.5336 21.7108 1.96794 29.5615 6.3059C37.4121 10.6439 39.8042 12.7282 40.4245 21.0544C40.7469 25.3924 39.4574 24.3079 39.4574 24.3079C39.4574 24.3079 37.7372 23.6577 37.5205 20.4043C37.3038 17.1508 31.8208 17.6917 30.9593 14.9818C30.0979 12.272 26.7658 5.00287 18.4844 1.5336Z" fill="url(#gpaint4g3)"></path></g><defs><filter id="gf0g3" x="7.5" y="4.10001" width="34" height="35" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="1.5" result="effect1_foregroundBlur"></fegaussianblur></filter><filter id="gf1g3" x="22.314" y="11.089" width="12.9573" height="12.4176" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feflood flood-opacity="0" result="BackgroundImageFix"></feflood><feblend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feblend><fegaussianblur stdDeviation="0" result="effect1_foregroundBlur"></fegaussianblur></filter><lineargradient id="gpaint0g3" x1="7.14103" y1="4.17693" x2="16.8846" y2="21.6128" gradientUnits="userSpaceOnUse"><stop stop-color="#4F4F4F"></stop><stop offset="1" stop-color="#4ABD18"></stop></lineargradient><lineargradient id="gpaint2g3" x1="21.9192" y1="36.4841" x2="21.4241" y2="8.79114" gradientUnits="userSpaceOnUse"><stop stop-color="#D8FFA2"></stop><stop offset="1" stop-color="#8AEC01"></stop></lineargradient><lineargradient id="gpaint3g3" x1="20.384" y1="34.4895" x2="36.4491" y2="25.5119" gradientUnits="userSpaceOnUse"><stop stop-color="#78CD00"></stop><stop offset="1" stop-color="#8AEC01"></stop></lineargradient><lineargradient id="gpaint4g3" x1="47.1422" y1="23.1502" x2="30.732" y2="1.61172" gradientUnits="userSpaceOnUse"><stop stop-color="#5B8D46"></stop><stop offset="1"></stop></lineargradient><clippath id="gclipg3"><rect width="42" height="38" fill="white"></rect></clippath></defs></svg></div>
+                <div class="sim-health-info">
+                  <div class="sim-health-name">未來發展</div>
+                  <div class="sim-health-level">無法判斷</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Content -->
+            <div class="agent-chat" id="agentChat">
+              <!-- Title injected by JS on start -->
+            </div>
+
+            <!-- Bottom Input Bar -->
+            <div class="agent-input-area">
+              <div class="agent-input-box">
+                <input type="text" id="agentInput" placeholder="想了解什麼？跟我說...">
+                <button class="agent-send-btn" id="agentSendBtn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+              </div>
+              <div class="agent-disclaimer">AI 生成內容僅供參考 · <span style="cursor:pointer;color:var(--orange)" id="agentResetBtn">重新開始</span></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="sandbox-footer">
+    沙盒版本 v0.1 — 僅供腳本編輯預覽用途
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">導出腳本</div>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <p style="font-size: var(--c--font-size-sm); color: var(--c--color-grey-600); margin-bottom: 12px;">
+        複製以下代碼到 <code style="background: var(--coolGray02); padding: 2px 4px; border-radius: 3px;">src/data/scripts/currentScript.js</code>
+      </p>
+      <div class="modal-code" id="modalCode"></div>
+      <div class="modal-actions">
+        <button class="modal-btn" id="modalCopyBtn">📋 複製到剪貼簿</button>
+        <button class="modal-btn" id="modalCloseBtn">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== PERSONA REGISTRY =====
+    const _personas = {};
+    _personas['patrick'] = { label: 'Patrick — 乙方不滿想跳甲方', script: {
+  theme: 'work',
+  version: 2,
+  startNode: 'job_0',
+
+  // =========================================================================
+  // 流程節點
+  // =========================================================================
+  nodes: {
+
+    /* ── job_0: 開場介紹 ── */
+    job_0: [
+      { type: 'text', text: 'Hi Patrick，我是你專屬的職涯精靈，我已根據你最近一份工作 <span class="data-tag">金汪汪</span> <span class="data-tag">PM</span> 與 104 獨家的大數據進行工作健康度檢測！我要說，你現在的工作是一份讓人羨慕的好工作——不過黃燈的判斷來自兩個面向：<strong>市場面</strong>跟<strong>個人面</strong>。我先帶你看市場面，好嗎？' },
+      { type: 'options' },
+    ],
+
+    /* ── job_1_a: 市場面全綠（5 張小卡 + 詢問）── */
+    job_1_a: [
+      { type: 'text', text: '你的工作不論是在產業、公司與職務都是成長中，而在工作中你的能力與市場需求結合，薪水也無可挑剔，客觀來說是超棒的工作：' },
+      { type: 'job_market_card' },
+      { type: 'text', text: '這是否跟你認知的一致？' },
+      { type: 'options' },
+    ],
+
+    /* ── job_2_bridge: 承接用戶「不是」→ 換場至個人面 ── */
+    job_2_bridge: [
+      { type: 'text', text: '我聽到你了 👂 市場數據確實很亮眼——但你的感受不一樣，這本身就是一個訊號。' },
+      { type: 'text', text: '讓我帶你看個人面的分析，你就會知道黃燈真正的原因在哪。' },
+      { type: 'auto_next', next: 'job_2_pre', delay: 800 },
+    ],
+
+    /* ── job_2_pre: 偵測工時問題 ── */
+    job_2_pre: [
+      { type: 'text', text: '我從金汪汪員工的評論數據裡，發現有一項指標特別低：工時滿意度。是不是加班的問題，讓你對這份工作的感受跟數據落差這麼大？' },
+      { type: 'options' },
+    ],
+
+    /* ── job_2_confirm: 個人紅燈揭曉 ── */
+    job_2_confirm: [
+      { type: 'text', text: 'Patrick 我懂，長期的工作生活失衡，在這份工作上是很難長久的。對你個人而言，我偵測到了你個人紅燈的訊號，你似乎就差最後一根稻草就要下定決心了。' },
+      { type: 'job_personal_card' },
+      { type: 'text', text: '在職涯精靈下小結前，想跟 Patrick 確認你的工作價值觀排序，這樣我給你的小結將不只是從你的行為足跡推論，而是更貼近你實際的狀況，我們開始確認好嗎？' },
+      { type: 'options' },
+    ],
+
+    /* ── job_3: 確認工作價值觀排序 ──
+     * job_value_card_input 為互動卡，onSubmit → job_3_rate */
+    job_3: [
+      { type: 'text', text: '以下是我從你的履歷跟你最近跟 104 的互動推論出的工作價值觀排序，請你確認排序是否符合：' },
+      { type: 'job_value_card_input', next: 'job_3_rate' },
+    ],
+
+    /* ── job_3_rate: Patrick 對金汪汪的星級評分 ──
+     * job_company_rating_card 為互動卡，onSubmit → job_3_analysis */
+    job_3_rate: [
+      { type: 'text', text: '謝謝你確認了！現在換你來告訴我，金汪汪在你心目中的表現如何？' },
+      { type: 'text', text: '針對以下幾個面向，給金汪汪打個分數吧：' },
+      { type: 'job_company_rating_card', next: 'job_4' },
+    ],
+
+    /* ── job_3_analysis: 三維度圖表分析 ── */
+    job_3_analysis: [
+      { type: 'text', text: '我把三個維度的資料整合在一起了 📊' },
+      { type: 'text', text: '你的工作價值觀、你對金汪汪的評分、還有其他同事對金汪汪的評論——三個角度放在一起，就能看出真正的落差在哪裡：' },
+      { type: 'job_triple_chart' },
+      { type: 'auto_next', next: 'job_4', delay: 1000 },
+    ],
+
+    /* ── job_4: 個人健康分析結果 ── */
+    job_4: [
+      { type: 'job_personal_health_card' },
+    ],
+
+  },
+
+  // =========================================================================
+  // 選項路由
+  // =========================================================================
+  options: {
+    job_0: [
+      { id: 'a', label: '好', next: 'job_1_a' },
+      { id: 'b', label: '不好', next: null },
+      { id: 'c', label: '這不是我現在的工作', next: null },
+    ],
+    job_1_a: [
+      { id: 'a', label: '是', next: null },
+      { id: 'b', label: '不是', next: 'job_2_bridge' },
+    ],
+    job_2_pre: [
+      { id: 'a', label: '是', next: 'job_2_confirm' },
+      { id: 'b', label: '不是', next: null },
+    ],
+    job_2_confirm: [
+      { id: 'a', label: '好', next: 'job_3' },
+      { id: 'b', label: '不好', next: null },
+    ],
+    // job_3: 由 job_value_card_input onSubmit → job_3_rate
+    // job_3_rate: 由 job_company_rating_card onSubmit → job_3_analysis
+  },
+
+  // =========================================================================
+  // 元件資料
+  // =========================================================================
+  data: {
+
+    // ── 市場面 5 張小卡 ──
+    market: {
+      dimensions: [
+        { icon: '🏢', label: '公司健康', value: '前段班', desc: '雇主品牌贏過 85%、員工滿意度 4.1 分（市場前段班）', status: 'green' },
+        { icon: '🏭', label: '產業健康', value: '看好', desc: '人才持續湧入，且市場持續看好', status: 'green' },
+        { icon: '📈', label: '職務未來健康', value: '持續成長', desc: '產品經理職缺近 3 年持續成長', status: 'green' },
+        { icon: '💰', label: '薪水', value: '贏過 75%', desc: '你的薪水贏過同職務 75% 的人，是高薪一族', status: 'green' },
+        { icon: '💡', label: '能力', value: '市場需要', desc: '市場很需要你的能力', tags: ['數據分析', '產品營運'], status: 'green' },
+      ],
+    },
+
+    // ── 個人工作價值觀卡片（部分鎖住）──
+    personalCard: {
+      level: 'red',
+      title: '個人工作價值觀',
+      dimensions: [
+        { label: '工作型態', personal: 1, market: 3, locked: false },
+        { label: '文化與管理風格', personal: 2, market: 2, locked: false },
+        { label: '成長與學習機會', personal: null, market: null, locked: true },
+        { label: '薪酬與福利期望', personal: null, market: null, locked: true },
+        { label: '工作意義與使命感', personal: null, market: null, locked: true },
+      ],
+    },
+
+    // ── Patrick 對公司的評分（互動卡資料）──
+    companyRating: {
+      title: '你對金汪汪的評分',
+      dimensions: [
+        { id: 'cr-1', label: '工作型態與彈性' },
+        { id: 'cr-2', label: '文化與管理風格' },
+        { id: 'cr-3', label: '成長與學習機會' },
+        { id: 'cr-4', label: '薪酬與福利' },
+        { id: 'cr-5', label: '工作意義與使命感' },
+      ],
+    },
+
+    // ── 三維度圖表資料（靜態 demo）──
+    tripleChart: {
+      labels: ['工作型態', '文化管理', '成長學習', '薪酬福利', '使命意義'],
+      datasets: [
+        { label: '我的價值觀重視度', color: '#6366F1', values: [5, 4, 4, 3, 4] },
+        { label: '我對金汪汪的評分', color: '#F59E0B', values: [1, 2, 3, 4, 2] },
+        { label: '同事對金汪汪評論', color: '#94A3B8', values: [2, 2, 3, 4, 3] },
+      ],
+      insight: '「工作型態」與「文化管理」是你最在乎、但金汪汪最讓你失望的兩個維度——這就是黃燈的核心原因。',
+    },
+
+    // ── 個人健康合成燈號小卡 ──
+    personalHealthCard: {
+      level: 'red',
+      title: '個人健康合成燈號：🔴 紅燈',
+      summary: '紅燈 3 個（文化、工作型態、使命感）＋ 黃燈 2 個（成長、團隊）＋ 綠燈 1 個（薪酬）',
+      highlight: '唯一的綠燈「薪酬」也是讓 Patrick 留下來的最大原因',
+      dimensions: [
+        { label: '文化與管理風格', level: 'red' },
+        { label: '工作型態', level: 'red' },
+        { label: '工作意義與使命感', level: 'red' },
+        { label: '成長與學習機會', level: 'yellow' },
+        { label: '團隊', level: 'yellow' },
+        { label: '薪酬與福利期望', level: 'green' },
+      ],
+    },
+
+    // ── 公司指標卡資料 ──
+    company: {
+      name: '金汪汪資訊科技',
+      stats: [
+        { icon: '🏆', value: 'PR 85', label: '雇主品牌排名', desc: '軟體業前 15%', color: '#FFF8E1' },
+        { icon: '💰', value: '120萬', label: '公司年薪中位數', desc: '較同產業上市櫃 +10%', color: '#E8F5E9' },
+        { icon: '⭐', value: '4.1', label: '員工滿意度', desc: '104公司評論', color: '#E3F2FD' },
+      ],
+    },
+
+    // ── 工作價值觀排序 ──
+    valueItems: ['工作生活平衡', '安全穩定', '豐厚報酬', '自我實現', '人際關係', '自由創意'],
+
+    // ── 價值觀雷達圖資料 ──
+    valueRadar: {
+      labels: ['工作生活平衡', '安全穩定', '豐厚報酬', '自我實現', '人際關係', '自由創意'],
+      company: [25, 40, 60, 100, 90, 45],
+      industry: [45, 45, 55, 65, 60, 65],
+    },
+
+    // ── 燈號更新卡 ──
+    lightCard: {
+      level: 'yellow',
+      title: '工作健康燈號：黃燈｜潛力無窮',
+      description: '市場面全綠，但個人面偵測到工作生活平衡的需求與現職有落差，長期來說值得關注。',
+    },
+
+    skills: [
+      { id: 'skill-1', label: '需求洞察與分析' },
+      { id: 'skill-2', label: '產品規劃與定義' },
+      { id: 'skill-3', label: '跨部門溝通協調' },
+      { id: 'skill-4', label: '專案時程與資源控管' },
+      { id: 'skill-5', label: '數據分析' },
+      { id: 'skill-6', label: '市場敏銳度與競品分析' },
+    ],
+
+    skillShortNames: {
+      'skill-1': '需求洞察',
+      'skill-2': '產品規劃',
+      'skill-3': '溝通協調',
+      'skill-4': '專案控管',
+      'skill-5': '數據分析',
+      'skill-6': '市場敏銳度',
+    },
+
+    skillRadar: {
+      labels: ['產品規劃', '專案控管', '溝通協調', '數據分析', '市場敏銳', '需求洞察'],
+      scores: [85, 80, 90, 35, 75, 80],
+      weakIndex: 3,
+    },
+
+    summary: [
+      { icon: '⚖️', label: '價值觀落差', value: '工作生活不平衡', color: '#FEE2E2' },
+      { icon: '⏳', label: '轉職急迫度', value: '還可以忍受一下', color: '#FEF9C3' },
+      { icon: '💡', label: '你的機會點', value: '增進數據分析能力', color: '#DCFCE7' },
+    ],
+
+    connections: [
+      {
+        name: '陳柏翰',
+        avatar: '🧑‍💼',
+        currentRole: '甲方 SaaS 公司｜Senior PM',
+        prevRole: '前：乙方軟體外包｜PM → 3 年前跳甲方',
+        story: '當初也在乙方待了 4 年，覺得一直在幫別人做產品。跳到甲方後終於能從 0 到 1 做自己的東西，薪水也漲了 25%。',
+        tags: ['乙方→甲方', 'SaaS', '產品經理'],
+      },
+      {
+        name: '林佳穎',
+        avatar: '👩‍💻',
+        currentRole: 'FinTech 新創｜Product Lead',
+        prevRole: '前：傳產 IT 部門｜企劃 → 2 年前轉入 FinTech',
+        story: '之前在傳產做了 5 年 PM，最痛苦的是永遠在追進度而不是思考產品方向。轉到甲方後，數據分析變成我最強的武器。',
+        tags: ['數據分析', 'FinTech', '甲方 PM'],
+      },
+      {
+        name: '張家豪',
+        avatar: '👨‍🎓',
+        currentRole: '外商科技｜Product Manager',
+        prevRole: '前：本土軟體公司｜資深企劃 → 1.5 年前跳外商',
+        story: '跳外商最大的門檻其實不是英文，而是要證明你有數據驅動決策的能力。我花了半年補強 SQL 跟 A/B testing，面試時直接加分。',
+        tags: ['外商', '數據驅動', '跨部門溝通'],
+      },
+    ],
+  },
+
+  // =========================================================================
+  // CoT 動畫配置
+  // =========================================================================
+  cot: {
+    job_1_a: {
+      parsing: '載入市場數據...',
+      stressIndexing: '比對 5 個市場維度...',
+      strategyFormulation: '生成市場面綜合評估...',
+    },
+    job_2_pre: {
+      parsing: '分析公司評論數據...',
+      stressIndexing: '偵測工時滿意度指標...',
+      strategyFormulation: '比對個人行為訊號...',
+    },
+    job_2_confirm: {
+      parsing: '分析瀏覽與搜尋行為...',
+      stressIndexing: '比對工作價值觀偏好訊號...',
+      strategyFormulation: '推估個人健康燈號...',
+    },
+    job_3_analysis: {
+      parsing: '整合三維度資料...',
+      stressIndexing: '比對價值觀與評分落差...',
+      strategyFormulation: '生成三維度圖表分析...',
+    },
+    job_4: {
+      parsing: '整合所有輸入資料...',
+      stressIndexing: '計算各維度符合度...',
+      strategyFormulation: '生成個人健康合成燈號...',
+    },
+  },
+
+  simple: {
+    placeholder: '你覺得目前工作有什麼卡住的？',
+    opening: 'Patrick，你目前的工作健康亮了<strong style="color:#FFB300;">黃燈｜潛力無窮</strong>。市場面來看你的條件相當不錯，但我們也從你的行為偵測到一些個人面的訊號。想先聊哪個方向？',
+    chips: [
+      { label: '💼 哪些職缺適合我？', key: 'jobs' },
+      { label: '📊 我的競爭力在哪？', key: 'compete' },
+      { label: '🔄 現在該換跑道嗎？', key: 'switch' },
+    ],
+    responses: {
+      jobs: '根據你的經歷和技能，目前有 <strong>3 類職缺</strong>最符合你：<br><br>• <strong>SaaS 產品經理</strong> — 你的 B2B 經驗是加分項，薪資帶在 85-110 萬<br>• <strong>AI 產品企劃</strong> — 需要補強 AI 工具鏈知識，但市場需求正在暴增<br>• <strong>資深 PM / Product Lead</strong> — 5 年經歷剛好是跳板，看管理或 IC 路線<br><br>想深入看哪一類的機會？',
+      compete: '跟同資歷的 PM 比，你的<strong>優勢</strong>在跨部門溝通和產品規劃，但<strong>缺口</strong>在數據分析和 AI 工具應用。市場上 70% 的 PM 職缺已經要求「數據驅動」經驗，這是你最需要補的一塊。',
+      switch: '以你目前的狀態，我的建議是<strong>「騎驢找馬」</strong>——不急著辭職，但要開始做兩件事：<br><br>1. 把履歷更新到最新版，重點放在可量化成果<br>2. 每週花 30 分鐘看 3 個職缺，了解市場在找什麼樣的人<br><br>這樣 3 個月後你就有足夠的資訊做決定了。',
+    },
+  },
+}};
+
+    // ===== LOAD PERSONA =====
+    function loadPersona(key) {
+      const persona = _personas[key];
+      if (!persona) return;
+      currentScript = JSON.parse(JSON.stringify(persona.script));
+      normalizeScript();
+    }
+
+    // 預設載入第一個 persona
+    loadPersona('patrick');
+
+    // ===== NORMALIZE: 主專案格式 → sandbox 引擎格式 =====
+    // 主專案用 { type: 'PR_card' }，sandbox 引擎期望 { type: 'card', cardType: 'PR_card' }
+    function normalizeScript() {
+      const TEXT_TYPES = new Set(['text', 'options', 'auto_next', 'image', 'cot']);
+      for (const [nodeId, steps] of Object.entries(currentScript.nodes)) {
+        currentScript.nodes[nodeId] = steps.map(step => {
+          if (TEXT_TYPES.has(step.type) || step.type === 'card') return step;
+          // 非基本類型 → 視為卡片
+          return { ...step, cardType: step.type, type: 'card' };
+        });
+      }
+      // 萃取 todos（如果 nodes 中有 job_todo_card 帶 title/reason）
+      if (!currentScript.data.todos) {
+        const todos = [];
+        for (const steps of Object.values(currentScript.nodes)) {
+          steps.forEach(step => {
+            if (step.cardType === 'job_todo_card' && step.title) {
+              const idx = todos.length;
+              todos.push({ title: step.title, reason: step.reason || '' });
+              step.index = idx;
+              delete step.title;
+              delete step.reason;
+            }
+            if (step.cardType === 'job_connect_card' && step.connect_index != null) {
+              step.index = step.connect_index;
+              delete step.connect_index;
+            }
+          });
+        }
+        if (todos.length > 0) currentScript.data.todos = todos;
+      }
+    }
+    // 初始 normalize
+    normalizeScript();
+
+    // ===== STATE =====
+    let currentMode = 'dialogue';
+    let currentNode = currentScript.startNode;
+    let messageHistory = [];
+    let skillRatings = {};
+
+    // ===== PERSONA SELECTOR =====
+    (function initPersonaSelect() { return; // patrick-only preview
+    //(
+      const sel = document.getElementById('personaSelect');
+      Object.entries(_personas).forEach(([key, p]) => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = p.label;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => {
+        loadPersona(sel.value);
+        populateNodeSelect();
+        if (currentMode === 'outline') {
+          renderOutlineMode();
+        } else {
+          resetDialogue();
+        }
+      });
+    })();
+
+    // ===== MODE TOGGLE =====
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        currentMode = e.target.dataset.mode;
+
+        document.getElementById('outlinePanel').classList.toggle('active', currentMode === 'outline');
+        document.getElementById('dialoguePanel').classList.toggle('active', currentMode === 'dialogue');
+        document.getElementById('nodeSelect').style.display = currentMode === 'dialogue' ? 'block' : 'none';
+        document.getElementById('resetBtn').style.display = currentMode === 'dialogue' ? 'block' : 'none';
+
+        if (currentMode === 'outline') {
+          renderOutlineMode();
+        } else {
+          resetDialogue();
+        }
+      });
+    });
+
+    // ===== RENDER OUTLINE MODE =====
+    function renderOutlineMode() {
+      const grid = document.getElementById('outlineGrid');
+      grid.innerHTML = '';
+
+      Object.entries(currentScript.nodes).forEach(([nodeId, steps]) => {
+        const card = document.createElement('div');
+        card.className = 'node-card';
+
+        if (nodeId === currentScript.startNode) {
+          card.classList.add('start-node');
+        } else {
+          const allOptions = currentScript.options[nodeId] || [];
+          const isDeadEnd = allOptions.length === 0 || allOptions.every(opt => opt.next === null);
+          if (isDeadEnd) card.classList.add('dead-end');
+        }
+
+        let html = `<div class="node-card-header">${nodeId}</div><div class="node-steps">`;
+
+        steps.forEach((step, idx) => {
+          if (step.type === 'text') {
+            html += `<div class="node-step text">
+              <div class="node-step-content">
+                <div class="node-step-icon">💬</div>
+                <div class="node-step-text-content">${escapeHtml(step.text)}</div>
+              </div>
+            </div>`;
+          } else if (step.type === 'card') {
+            html += `<div class="node-step card">
+              📊 ${step.cardType}${step.next ? ` → <strong>${step.next}</strong>` : ''}
+            </div>`;
+          } else if (step.type === 'cot') {
+            html += `<div class="node-step">⚡ CoT: ${step.phases.join(' → ')}</div>`;
+          } else if (step.type === 'auto_next') {
+            html += `<div class="node-step auto-next">
+              ⏱️ Auto-next (${step.delay}ms) → <strong>${step.next}</strong>
+            </div>`;
+          } else if (step.type === 'options') {
+            const opts = currentScript.options[nodeId] || [];
+            html += `<div class="node-step options">`;
+            opts.forEach(opt => {
+              const label = opt.label || '💬 自由輸入';
+              const nextText = opt.next ? `→ ${opt.next}` : opt.id === 'freekey' ? '' : '(腳本結束)';
+              const isFreekey = opt.id === 'freekey';
+              const isDead = opt.next === null;
+              html += `<div class="option-btn ${isFreekey ? 'freekey' : ''} ${isDead ? 'dead' : ''}">
+                ${label} ${nextText}
+              </div>`;
+            });
+            html += `</div>`;
+          }
+        });
+
+        html += `</div>`;
+        card.innerHTML = html;
+        grid.appendChild(card);
+      });
+
+      // Data section
+      const dataSection = document.createElement('div');
+      dataSection.className = 'data-section';
+      dataSection.innerHTML = '<div class="data-title">📦 Script Data</div>';
+
+      Object.entries(currentScript.data).forEach(([key, value]) => {
+        const collapsible = document.createElement('div');
+        collapsible.className = 'data-collapsible';
+        collapsible.innerHTML = `
+          <div class="data-collapsible-title">${key}</div>
+          <div class="data-collapsible-content"><pre>${escapeHtml(JSON.stringify(value, null, 2))}</pre></div>
+        `;
+        collapsible.querySelector('.data-collapsible-title').addEventListener('click', () => {
+          collapsible.classList.toggle('open');
+        });
+        dataSection.appendChild(collapsible);
+      });
+
+      grid.parentElement.appendChild(dataSection);
+    }
+
+    // ===== RENDER DIALOGUE MODE =====
+    let _freekeyCallback = null; // current freekey handler
+
+    function resetDialogue() {
+      currentNode = currentScript.startNode;
+      messageHistory = [];
+      skillRatings = {};
+      _freekeyCallback = null;
+      const chat = document.getElementById('agentChat');
+      chat.innerHTML = '';
+
+      // Insert title bar as first scrollable element
+      const titleBar = document.createElement('div');
+      titleBar.className = 'agent-header';
+      titleBar.innerHTML = `
+        <div class="agent-title-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+        </div>
+        <div class="agent-title">職涯精靈</div>
+      `;
+      chat.appendChild(titleBar);
+
+      // Reset health banner dot for work
+      const workLevel = document.querySelector('.sim-health-item.active-theme .sim-health-level');
+      if (workLevel) { workLevel.textContent = '潛力無窮'; }
+
+      // Reset bottom input bar
+      updateInputPlaceholder('想了解什麼？跟我說...');
+
+      playNode(currentNode);
+    }
+
+    function updateInputPlaceholder(text) {
+      const input = document.getElementById('agentInput');
+      if (input) input.placeholder = text;
+    }
+
+    function updateHealthBannerDot(level) {
+      const labelMap = { yellow: '大有可為', red: '需要關注', green: '令人激賞', gray: '無法判斷' };
+      const label = document.querySelector('.sim-health-item.active-theme .sim-health-level');
+      if (label) label.textContent = labelMap[level] || labelMap.gray;
+    }
+
+    // Wire up bottom input bar for freekey
+    document.getElementById('agentSendBtn').addEventListener('click', handleSendInput);
+    document.getElementById('agentInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSendInput();
+    });
+
+    function handleSendInput() {
+      const input = document.getElementById('agentInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      if (_freekeyCallback) {
+        _freekeyCallback(text);
+        _freekeyCallback = null;
+      }
+    }
+
+    function playNode(nodeId) {
+      if (!currentScript.nodes[nodeId]) return;
+
+      const steps = currentScript.nodes[nodeId];
+      let delayOffset = 0;
+
+      steps.forEach((step, idx) => {
+        const isLastTextBeforeOptions = steps.slice(idx + 1).every(s => s.type === 'options' || s.type === 'auto_next');
+
+        if (step.type === 'text') {
+          setTimeout(() => addBotMessage(step.text, isLastTextBeforeOptions && idx === steps.length - 2), delayOffset);
+          delayOffset += (step.text.length * 30) + 600;
+        } else if (step.type === 'card') {
+          setTimeout(() => renderCard(step, nodeId), delayOffset);
+          delayOffset += 800;
+        } else if (step.type === 'cot') {
+          setTimeout(() => renderCoT(step), delayOffset);
+          delayOffset += step.phases.length * 600 + 400;
+        } else if (step.type === 'options') {
+          setTimeout(() => renderOptions(nodeId), delayOffset);
+          delayOffset += 400;
+        } else if (step.type === 'auto_next') {
+          setTimeout(() => {
+            currentNode = step.next;
+            playNode(step.next);
+          }, delayOffset + step.delay);
+        }
+      });
+    }
+
+    function addBotMessage(text, isLast = false) {
+      const chat = document.getElementById('agentChat');
+      const msg = document.createElement('div');
+      msg.className = 'agent-chat-bot typing';
+      let charIdx = 0;
+      let content = '';
+
+      const typeWriter = () => {
+        if (charIdx < text.length) {
+          content += text[charIdx];
+          msg.innerHTML = content + '▊';
+          charIdx++;
+          setTimeout(typeWriter, 30);
+        } else {
+          msg.classList.remove('typing');
+          msg.innerHTML = content;
+          chat.scrollTop = chat.scrollHeight;
+        }
+      };
+
+      chat.appendChild(msg);
+      typeWriter();
+    }
+
+    function renderOptions(nodeId) {
+      const chat = document.getElementById('agentChat');
+      const opts = currentScript.options[nodeId] || [];
+      const container = document.createElement('div');
+      container.className = 'agent-options';
+
+      let freekeyOpt = null;
+      opts.forEach(opt => {
+        if (opt.id === 'freekey') {
+          freekeyOpt = opt;
+        } else {
+          const btn = document.createElement('button');
+          btn.className = 'agent-option-btn';
+          btn.textContent = opt.label;
+          btn.addEventListener('click', () => {
+            const nextNode = opt.next;
+            if (nextNode) {
+              // Has next: disable all buttons + highlight selected
+              container.querySelectorAll('.agent-option-btn').forEach(b => {
+                b.disabled = true;
+                b.style.pointerEvents = 'none';
+              });
+              btn.classList.add('selected');
+              _freekeyCallback = null;
+              addUserMessage(opt.label);
+              currentNode = nextNode;
+              setTimeout(() => playNode(nextNode), 400);
+            } else {
+              // No next: keep buttons enabled, just show toast
+              showToast('🚧 此路線腳本尚未串接');
+            }
+          });
+          container.appendChild(btn);
+        }
+      });
+
+      if (container.children.length > 0) {
+        chat.appendChild(container);
+      }
+
+      // If freekey exists, activate bottom input bar
+      if (freekeyOpt) {
+        updateInputPlaceholder('輸入你的想法...');
+        _freekeyCallback = (text) => {
+          // Disable option buttons
+          container.querySelectorAll('.agent-option-btn').forEach(b => {
+            b.disabled = true; b.style.pointerEvents = 'none';
+          });
+          addUserMessage(text);
+          if (freekeyOpt.next) {
+            currentNode = freekeyOpt.next;
+            setTimeout(() => playNode(freekeyOpt.next), 400);
+          } else {
+            showToast('🚧 此路線腳本尚未串接，請重新開始');
+            updateInputPlaceholder('此路線已結束，請點「重新開始」');
+          }
+        };
+      }
+
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+      const chat = document.getElementById('agentChat');
+      const bubble = document.createElement('div');
+      bubble.className = 'agent-chat-user';
+      bubble.innerHTML = `<div class="agent-chat-user-text">${escapeHtml(text)}</div>`;
+      chat.appendChild(bubble);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function renderCoT(step) {
+      const chat = document.getElementById('agentChat');
+      const container = document.createElement('div');
+      container.className = 'cot-thinking';
+
+      step.phases.forEach((phase, idx) => {
+        setTimeout(() => {
+          const phaseEl = document.createElement('div');
+          phaseEl.className = 'cot-phase';
+          phaseEl.innerHTML = `<div class="cot-spinner"></div><span>${phase}</span>`;
+          container.appendChild(phaseEl);
+          chat.scrollTop = chat.scrollHeight;
+        }, idx * 600);
+      });
+
+      chat.appendChild(container);
+    }
+
+    function renderCard(step, nodeId) {
+      const chat = document.getElementById('agentChat');
+      const card = document.createElement('div');
+      card.className = 'job-card';
+
+      switch (step.cardType) {
+        case 'PR_card':
+          card.innerHTML = `
+            <div class="job-pr-title">猜猜看 金汪汪資訊科技 的 PR 值</div>
+            <div class="job-pr-desc">PR 值代表在同產業中的排名百分位，PR100 為最佳</div>
+            <div class="job-pr-display">
+              <span class="job-pr-label">你的猜測</span>
+              <span class="job-pr-value">PR <span class="job-pr-num" id="prValue">50</span></span>
+            </div>
+            <div class="job-pr-slider-wrap">
+              <span class="job-pr-min">0</span>
+              <input type="range" class="job-pr-slider" min="0" max="100" value="50" step="5" id="prSlider">
+              <span class="job-pr-max">100</span>
+            </div>
+            <button class="job-pr-submit">送出我的答案</button>
+          `;
+          const slider = card.querySelector('#prSlider');
+          const prValue = card.querySelector('#prValue');
+          slider.addEventListener('input', (e) => {
+            prValue.textContent = e.target.value;
+          });
+          card.querySelector('.job-pr-submit').addEventListener('click', () => {
+            const nextStep = step.next;
+            if (nextStep) {
+              addUserMessage(`我的答案是: PR ${prValue.textContent}`);
+              currentNode = nextStep;
+              setTimeout(() => playNode(nextStep), 400);
+            }
+          });
+          break;
+
+        case 'job_company_card':
+          const company = currentScript.data.company;
+          card.innerHTML = `
+            <div class="job-card-header">
+              <div class="job-card-title">${company.name}</div>
+              <div class="job-card-subtitle">企業數據總覽</div>
+            </div>
+            <div class="job-company-stats">
+              ${company.stats.map(stat => `
+                <div class="job-company-stat" style="background: ${stat.color}">
+                  <div class="job-company-stat-icon">${stat.icon}</div>
+                  <div class="job-company-stat-value">${stat.value}</div>
+                  <div class="job-company-stat-label">${stat.label}</div>
+                  <div class="job-company-stat-desc">${stat.desc}</div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+          break;
+
+        case 'job_value_card_input':
+          card.innerHTML = `
+            <div class="job-card-title">你最在乎的工作價值觀</div>
+            <div class="job-card-subtitle">拖曳排列順序，第一項是你最在乎的</div>
+            <ul class="job-value-list" id="valueList">
+              ${currentScript.data.valueItems.map((item, idx) => `
+                <li class="job-value-item" data-idx="${idx}">
+                  <span class="job-value-rank">${idx + 1}</span>
+                  <span class="job-value-label">${item}</span>
+                  <span class="job-value-grip">☰</span>
+                </li>
+              `).join('')}
+            </ul>
+            <button class="job-value-submit">確認排序</button>
+          `;
+          initValueDragDrop(card, step);
+          break;
+
+        case 'job_value_card_output':
+          card.innerHTML = `
+            <svg class="job-radar-svg" viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="radarGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#9CA3AF;stop-opacity:0.1" />
+                  <stop offset="100%" style="stop-color:#9CA3AF;stop-opacity:0.3" />
+                </linearGradient>
+                <linearGradient id="radarGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#F43F5E;stop-opacity:0.1" />
+                  <stop offset="100%" style="stop-color:#F43F5E;stop-opacity:0.3" />
+                </linearGradient>
+              </defs>
+              ${[1, 0.75, 0.5, 0.25].map(ratio => {
+                const radius = 100 * ratio;
+                return `<circle cx="150" cy="140" r="${radius}" fill="none" stroke="#E5E7EB" stroke-width="1" opacity="0.5"/>`;
+              }).join('')}
+              ${[0, 60, 120, 180, 240, 300].map((angle, idx) => {
+                const rad = (angle - 90) * Math.PI / 180;
+                const x = 150 + 100 * Math.cos(rad);
+                const y = 140 + 100 * Math.sin(rad);
+                return `<line x1="150" y1="140" x2="${x}" y2="${y}" stroke="#E5E7EB" stroke-width="1" opacity="0.3"/>`;
+              }).join('')}
+              ${renderRadarPolygon(currentScript.data.valueRadar.company, 'url(#radarGradient2)', '#F43F5E')}
+              ${renderRadarPolygon(currentScript.data.valueRadar.industry, 'url(#radarGradient1)', '#9CA3AF')}
+              ${currentScript.data.valueRadar.labels.map((label, idx) => {
+                const angle = (idx * 60 - 90) * Math.PI / 180;
+                const x = 150 + 115 * Math.cos(angle);
+                const y = 140 + 115 * Math.sin(angle);
+                return `<text x="${x}" y="${y}" class="radar-label">${label}</text>`;
+              }).join('')}
+            </svg>
+            <div class="radar-legend">
+              <div class="radar-legend-item">
+                <div class="radar-legend-dot" style="background: #F43F5E;"></div>
+                <span>你的公司</span>
+              </div>
+              <div class="radar-legend-item">
+                <div class="radar-legend-dot" style="background: #9CA3AF;"></div>
+                <span>產業平均</span>
+              </div>
+            </div>
+          `;
+          break;
+
+        case 'job_light_card':
+          const lc = currentScript.data.lightCard;
+          const lcColors = {
+            yellow: { bg: '#FFF8E1', border: '#FFE082', dot: '#FFB300', text: '#8D6E00' },
+            red:    { bg: '#FEE2E2', border: '#FCA5A5', dot: '#EF4444', text: '#991B1B' },
+            green:  { bg: '#DCFCE7', border: '#86EFAC', dot: '#22C55E', text: '#166534' },
+          };
+          const lcC = lcColors[lc.level] || lcColors.yellow;
+          card.style.background = lcC.bg;
+          card.style.borderColor = lcC.border;
+          card.innerHTML = `
+            <div class="job-light-header" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <span class="job-light-dot" style="width:12px;height:12px;border-radius:50%;background:${lcC.dot};flex-shrink:0;"></span>
+              <span style="font-weight:700;color:${lcC.text}">${lc.title}</span>
+            </div>
+            <div style="font-size:13px;color:${lcC.text};line-height:1.6;">${lc.description}</div>
+            <div style="margin-top:10px;text-align:center;font-size:12px;color:${lcC.text};opacity:0.7;">
+              <span>↑</span> <span>↑</span> 燈號已更新，看看上方的變化
+            </div>
+          `;
+          // Update the simulated health banner
+          setTimeout(() => updateHealthBannerDot(lc.level), 300);
+          break;
+
+        case 'job_skill_card_input':
+          card.innerHTML = `
+            <div class="job-card-title">PM 核心能力自評</div>
+            <div class="job-card-subtitle">點選星星評估你目前的強度（1-5）</div>
+            <div class="job-skill-input-list" id="skillList">
+              ${currentScript.data.skills.map(skill => `
+                <div class="job-skill-input-row">
+                  <div class="job-skill-input-label">${skill.label}</div>
+                  <div class="job-skill-input-stars" data-skill-id="${skill.id}">★★★★★</div>
+                </div>
+              `).join('')}
+            </div>
+            <button class="job-skill-input-submit" disabled id="skillSubmit">確認送出</button>
+          `;
+          initSkillRating(card, step);
+          break;
+
+        case 'job_skill_card_summary':
+          card.innerHTML = `
+            <div class="job-skill-summary-grid">
+              ${currentScript.data.summary.map(item => `
+                <div class="job-skill-summary-card" style="background: ${item.color}">
+                  <div class="job-skill-summary-icon">${item.icon}</div>
+                  <div>
+                    <div style="opacity: 0.8; font-size: var(--c--font-size-xs);">${item.label}</div>
+                    <div>${item.value}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+          break;
+
+        case 'job_todo_card':
+          const todo = currentScript.data.todos[step.index];
+          let todoNumber = step.index + 1;
+          card.innerHTML = `
+            <div class="job-todo-item">
+              <div class="job-todo-header">
+                <div class="job-todo-number">${todoNumber}</div>
+                <div class="job-todo-title">${todo.title}</div>
+              </div>
+              <div class="job-todo-reason">${todo.reason}</div>
+            </div>
+          `;
+          break;
+
+
+        case 'job_market_card':
+          const market = currentScript.data.market;
+          card.innerHTML = `
+            <div style="font-weight:700;font-size:14px;color:#111827;margin-bottom:4px;">市場面分析</div>
+            <div style="font-size:12px;color:#6B7280;margin-bottom:10px;">5 個維度，全部亮綠燈 ✅ &nbsp;← 左右滑動</div>
+            <div class="job-market-scroll" id="marketScroll">
+              ${market.dimensions.map((dim, i) => `
+                <div class="job-market-slide">
+                  <div class="job-market-slide-top">
+                    <span class="job-market-slide-icon">${dim.icon}</span>
+                    <span class="job-market-dim-badge green">${dim.value}</span>
+                  </div>
+                  <div class="job-market-dim-label">${dim.label}</div>
+                  <div class="job-market-dim-desc">${dim.desc}${dim.tags ? '<br>' + dim.tags.map(t => '<span class="job-market-hashtag">#' + t + '</span>').join('') : ''}</div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="job-market-dots">
+              ${market.dimensions.map((_, i) => `<div class="job-market-dot${i === 0 ? ' active' : ''}" data-idx="${i}"></div>`).join('')}
+            </div>
+          `;
+          (function() {
+            const scroll = card.querySelector('#marketScroll');
+            const dots = card.querySelectorAll('.job-market-dot');
+            scroll.addEventListener('scroll', () => {
+              const idx = Math.round(scroll.scrollLeft / (scroll.scrollWidth / market.dimensions.length));
+              dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+            });
+          })();
+          break;
+
+        case 'job_personal_card':
+          const pc = currentScript.data.personalCard;
+          const toStars = (n, total=5) => '★'.repeat(n) + '☆'.repeat(total - n);
+          card.style.background = '#FEF2F2';
+          card.style.borderColor = '#FCA5A5';
+          card.innerHTML = `
+            <div class="job-personal-card-header">
+              <div style="font-weight:700;font-size:14px;color:#991B1B;">${pc.title}</div>
+              <span class="job-personal-badge">🔴 紅燈</span>
+            </div>
+            <div style="font-size:11px;color:#6B7280;margin-bottom:8px;display:flex;gap:12px;">
+              <span><span style="color:#EF4444;font-size:13px;">★</span> 個人符合度</span>
+              <span><span style="color:#94A3B8;font-size:13px;">★</span> 市場常模</span>
+            </div>
+            <div class="job-personal-dims">
+              ${pc.dimensions.map(dim => dim.locked ? `
+                <div class="job-personal-dim locked">
+                  <div class="job-personal-dim-label">🔒 ${dim.label}</div>
+                  <div class="job-personal-dim-scores locked-text">完成確認後解鎖</div>
+                </div>
+              ` : `
+                <div class="job-personal-dim">
+                  <div class="job-personal-dim-label">${dim.label}</div>
+                  <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-end;">
+                    <div style="color:#EF4444;font-size:14px;letter-spacing:1px;">${toStars(dim.personal)}</div>
+                    <div style="color:#94A3B8;font-size:14px;letter-spacing:1px;">${toStars(dim.market)}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+          break;
+
+        case 'job_personal_health_card':
+          const phc = currentScript.data.personalHealthCard;
+          const phcDotColor = { red: '#EF4444', yellow: '#FFB300', green: '#22C55E' };
+          card.style.background = '#FEF2F2';
+          card.style.borderColor = '#FCA5A5';
+          card.innerHTML = `
+            <div style="font-weight:700;color:#991B1B;font-size:14px;margin-bottom:6px;">${phc.title}</div>
+            <div style="font-size:12px;color:#7F1D1D;margin-bottom:4px;">${phc.summary}</div>
+            <div class="job-health-dims">
+              ${phc.dimensions.map(dim => `
+                <div class="job-health-dim">
+                  <span class="job-health-dot" style="background:${phcDotColor[dim.level]};"></span>
+                  <span>${dim.label}</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+          break;
+
+
+        case 'job_company_rating_card':
+          const cr = currentScript.data.companyRating;
+          const crScores = {};
+          card.innerHTML = `
+            <div style="font-weight:700;font-size:14px;color:#111827;margin-bottom:10px;">${cr.title}</div>
+            <div id="crRows">
+              ${cr.dimensions.map(dim => `
+                <div class="job-rating-row" data-id="${dim.id}">
+                  <div class="job-rating-label">${dim.label}</div>
+                  <div class="job-rating-stars">
+                    ${[1,2,3,4,5].map(n => `<span class="job-rating-star" data-val="${n}">★</span>`).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <button class="job-rating-submit" id="crSubmit" disabled>送出評分</button>
+          `;
+          (function() {
+            card.querySelectorAll('.job-rating-row').forEach(row => {
+              const id = row.dataset.id;
+              row.querySelectorAll('.job-rating-star').forEach(star => {
+                star.addEventListener('click', () => {
+                  const val = parseInt(star.dataset.val);
+                  crScores[id] = val;
+                  row.querySelectorAll('.job-rating-star').forEach((s, i) => {
+                    s.classList.toggle('active', i < val);
+                  });
+                  const allDone = cr.dimensions.every(d => crScores[d.id]);
+                  const btn = card.querySelector('#crSubmit');
+                  btn.disabled = !allDone;
+                  btn.classList.toggle('ready', allDone);
+                });
+              });
+            });
+            card.querySelector('#crSubmit').addEventListener('click', () => {
+              const nextNode = step.next;
+              if (nextNode) {
+                addUserMessage('評分完成！');
+                currentNode = nextNode;
+                setTimeout(() => playNode(nextNode), 400);
+              }
+            });
+          })();
+          break;
+
+        case 'job_triple_chart':
+          const tc = currentScript.data.tripleChart;
+          card.innerHTML = `
+            <div class="job-triple-legend">
+              ${tc.datasets.map(ds => `
+                <div class="job-triple-legend-item">
+                  <div class="job-triple-legend-dot" style="background:${ds.color};"></div>
+                  <span>${ds.label}</span>
+                </div>
+              `).join('')}
+            </div>
+            <div class="job-triple-chart-wrap">
+              ${tc.labels.map((label, i) => `
+                <div class="job-triple-bar-row">
+                  <div class="job-triple-bar-label">${label}</div>
+                  <div class="job-triple-bars">
+                    ${tc.datasets.map(ds => `
+                      <div class="job-triple-bar-line">
+                        <div class="job-triple-bar-name">${ds.label.slice(0,8)}…</div>
+                        <div class="job-triple-bar-track">
+                          <div class="job-triple-bar-fill" style="width:${ds.values[i]/5*100}%;background:${ds.color};"></div>
+                        </div>
+                        <span style="font-size:11px;color:#6B7280;width:16px;">${ds.values[i]}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="job-triple-insight">💡 ${tc.insight}</div>
+          `;
+          break;
+
+        case 'job_connect_card':
+          const conn = currentScript.data.connections[step.index];
+          card.innerHTML = `
+            <div class="job-connect-card">
+              <div class="job-connect-header">
+                <div class="job-connect-avatar">${conn.avatar}</div>
+                <div class="job-connect-info">
+                  <div class="job-connect-name">${conn.name}</div>
+                  <div class="job-connect-role">${conn.currentRole}</div>
+                  <div class="job-connect-prev">${conn.prevRole}</div>
+                </div>
+              </div>
+              <div class="job-connect-story">${conn.story}</div>
+              <div class="job-connect-tags">
+                ${conn.tags.map(tag => `<span class="job-connect-tag">${tag}</span>`).join('')}
+              </div>
+              <button class="job-connect-cta">連絡人脈</button>
+            </div>
+          `;
+          break;
+      }
+
+      chat.appendChild(card);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function initValueDragDrop(card, step) {
+      const list = card.querySelector('#valueList');
+      let draggedItem = null;
+
+      list.addEventListener('pointerdown', (e) => {
+        const item = e.target.closest('.job-value-item');
+        if (item && e.target.closest('.job-value-grip')) {
+          draggedItem = item;
+          item.classList.add('dragging');
+        }
+      });
+
+      document.addEventListener('pointermove', (e) => {
+        if (!draggedItem) return;
+        const items = [...list.querySelectorAll('.job-value-item')];
+        const siblings = items.filter(i => i !== draggedItem);
+        const overItem = siblings.find(i => {
+          const rect = i.getBoundingClientRect();
+          return e.clientY < rect.top + rect.height / 2;
+        });
+
+        if (overItem) {
+          list.insertBefore(draggedItem, overItem);
+        } else if (siblings.length > 0) {
+          list.appendChild(draggedItem);
+        }
+      });
+
+      document.addEventListener('pointerup', () => {
+        if (draggedItem) {
+          draggedItem.classList.remove('dragging');
+          // Update rank numbers
+          list.querySelectorAll('.job-value-item').forEach((item, idx) => {
+            item.querySelector('.job-value-rank').textContent = idx + 1;
+          });
+          draggedItem = null;
+        }
+      });
+
+      card.querySelector('.job-value-submit').addEventListener('click', () => {
+        const nextNode = step.next;
+        if (nextNode) {
+          const order = [...list.querySelectorAll('.job-value-label')].map(el => el.textContent);
+          addUserMessage(`我的價值觀排序: ${order.join(' > ')}`);
+          currentNode = nextNode;
+          setTimeout(() => playNode(nextNode), 400);
+        }
+      });
+    }
+
+    function initSkillRating(card, step) {
+      const stars = card.querySelectorAll('.job-skill-input-stars');
+      const submitBtn = card.querySelector('#skillSubmit');
+
+      stars.forEach(star => {
+        const skillId = star.dataset.skillId;
+        star.addEventListener('click', (e) => {
+          const starIdx = Array.from(star.querySelectorAll('span') || '').indexOf(e.target);
+          const rating = starIdx >= 0 ? starIdx + 1 : 5;
+          skillRatings[skillId] = rating;
+
+          // Update display
+          let display = '';
+          for (let i = 1; i <= 5; i++) {
+            display += i <= rating ? '★' : '☆';
+          }
+          star.textContent = display;
+          star.classList.add('rated');
+
+          // Enable submit if all rated
+          if (Object.keys(skillRatings).length === currentScript.data.skills.length) {
+            submitBtn.disabled = false;
+          }
+        });
+      });
+
+      submitBtn.addEventListener('click', () => {
+        if (step.next) {
+          addUserMessage('我已完成能力自評');
+          currentNode = step.next;
+          setTimeout(() => playNode(step.next), 400);
+        }
+      });
+    }
+
+    function renderRadarPolygon(values, fillUrl, stroke) {
+      const angles = [0, 60, 120, 180, 240, 300];
+      const points = angles.map((angle, idx) => {
+        const rad = (angle - 90) * Math.PI / 180;
+        const ratio = values[idx] / 100;
+        const x = 150 + ratio * 100 * Math.cos(rad);
+        const y = 140 + ratio * 100 * Math.sin(rad);
+        return `${x},${y}`;
+      }).join(' ');
+
+      return `<polygon points="${points}" fill="${fillUrl}" stroke="${stroke}" stroke-width="2" opacity="0.7"/>`;
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast-notification';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2800);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ===== EXPORT BUTTON =====
+    // 將沙盒內部格式轉回原始腳本格式
+    function toOriginalFormat(script) {
+      const out = {
+        theme: script.theme,
+        version: script.version,
+        startNode: script.startNode,
+        nodes: {},
+        options: JSON.parse(JSON.stringify(script.options)),
+        cot: JSON.parse(JSON.stringify(script.cot || {})),
+        data: JSON.parse(JSON.stringify(script.data)),
+        simple: JSON.parse(JSON.stringify(script.simple || {})),
+      };
+      // 轉換 nodes：把 { type:'card', cardType:'X' } → { type:'X' }
+      for (const [nodeId, steps] of Object.entries(script.nodes)) {
+        out.nodes[nodeId] = steps.map(s => {
+          if (s.type === 'card') {
+            const { cardType, ...rest } = s;
+            delete rest.type;
+            // todo_card 還原為 inline title/reason
+            if (cardType === 'job_todo_card' && s.index != null && script.data.todos) {
+              const todo = script.data.todos[s.index];
+              return { type: cardType, title: todo.title, reason: todo.reason };
+            }
+            // connect_card 還原為 connect_index
+            if (cardType === 'job_connect_card' && s.index != null) {
+              return { type: cardType, connect_index: s.index };
+            }
+            return { type: cardType, ...rest };
+          }
+          if (s.type === 'cot') {
+            // CoT 不放在 nodes 裡，跳過
+            return null;
+          }
+          return { ...s };
+        }).filter(Boolean);
+      }
+      // 移除 data.todos（原始格式裡沒有）
+      delete out.data.todos;
+      return out;
+    }
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const original = toOriginalFormat(currentScript);
+      const varName = currentScript.theme + 'Script';
+      const code = `const ${varName} = ${JSON.stringify(original, null, 2)};\n\nexport default ${varName};`;
+      document.getElementById('modalCode').textContent = code;
+      document.getElementById('modalOverlay').classList.add('active');
+    });
+
+    document.getElementById('modalClose').addEventListener('click', () => {
+      document.getElementById('modalOverlay').classList.remove('active');
+    });
+
+    document.getElementById('modalCloseBtn').addEventListener('click', () => {
+      document.getElementById('modalOverlay').classList.remove('active');
+    });
+
+    document.getElementById('modalCopyBtn').addEventListener('click', () => {
+      const code = document.getElementById('modalCode').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('✓ 已複製到剪貼簿');
+      });
+    });
+
+    // ===== DIALOGUE MODE CONTROLS =====
+    document.getElementById('resetBtn').addEventListener('click', resetDialogue);
+    document.getElementById('agentResetBtn').addEventListener('click', resetDialogue);
+    document.getElementById('agentCloseBtn')?.addEventListener('click', () => {
+      document.getElementById('dialoguePanel').classList.remove('active');
+      document.getElementById('outlinePanel').classList.add('active');
+      document.querySelectorAll('.mode-btn')[0].classList.add('active');
+      document.querySelectorAll('.mode-btn')[1].classList.remove('active');
+      currentMode = 'outline';
+    });
+
+    // ===== NODE SELECT DROPDOWN =====
+    function populateNodeSelect() {
+      const select = document.getElementById('nodeSelect');
+      select.innerHTML = '<option value="">跳轉到節點...</option>';
+      Object.keys(currentScript.nodes).forEach(nodeId => {
+        const option = document.createElement('option');
+        option.value = nodeId;
+        option.textContent = nodeId;
+        select.appendChild(option);
+      });
+
+      select.addEventListener('change', (e) => {
+        if (e.target.value) {
+          currentNode = e.target.value;
+          document.getElementById('agentChat').innerHTML = '';
+          playNode(currentNode);
+          e.target.value = '';
+        }
+      });
+    }
+
+    // ===== INIT =====
+    populateNodeSelect();
+    resetDialogue();
+  </script>
+</body>
+</html>
